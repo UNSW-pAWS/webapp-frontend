@@ -8,6 +8,10 @@ import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 import { Header } from "../../components/Header";
 
@@ -18,6 +22,20 @@ const styles = (theme) => ({
 	formContainer: {
 		width: "fit-content",
 		marginRight: "1rem"
+	},
+	selectContainer: {
+		width: "100%",
+		marginBottom: "1rem"
+	},
+	selectRoot: {
+		color: "#FFFFFF",
+		border: "#FF9900 1px solid",
+	},
+	selectIcon: {
+		color: theme.palette.primary.main
+	},
+	selectItem: {
+		color: "#000000",
 	},
 	textField: {
 		display: "flex",
@@ -34,10 +52,10 @@ const styles = (theme) => ({
 		float: "right"
 	},
 	resultsContainer: {
-		marginTop: "2rem",
+		marginTop: "3rem",
 		marginLeft: "1rem",
 		width: "30rem",
-		height: "20rem",
+		height: "22.5rem",
 	},
 	resultsPaper: {
 		width: "100%",
@@ -77,6 +95,38 @@ export class LandingPage extends React.Component {
 					<Grid container item xs={6}>
 						<Container className={classes.baseContainer}>
 							<Container className={classes.formContainer}>
+								<Grid container spacing={2}>
+									<Grid item xs={6}>
+										<FormControl className={classes.selectContainer}>
+											<FormHelperText>Package Manager</FormHelperText>
+											<Select
+												className={classes.selectRoot}
+												classes={{ iconOutlined: classes.selectIcon }}
+												fullWidth
+												value={"npm"}
+												variant={"outlined"}
+											>
+												<MenuItem className={classes.selectItem} value={"npm"}>NPM</MenuItem>
+											</Select>
+										</FormControl>
+									</Grid>
+									<Grid container item xs={4} justify={"flex-end"} alignItems={"flex-end"}>
+										<FormControl className={classes.selectContainer}>
+											<FormHelperText>Dependency Depth</FormHelperText>
+											<Select
+												className={classes.selectRoot}
+												classes={{ iconOutlined: classes.selectIcon }}
+												fullWidth
+												value={1}
+												variant={"outlined"}
+											>
+												<MenuItem className={classes.selectItem} value={1}>1</MenuItem>
+												<MenuItem className={classes.selectItem} value={2}>2</MenuItem>
+												<MenuItem className={classes.selectItem} value={3}>3</MenuItem>
+											</Select>
+										</FormControl>
+									</Grid>
+								</Grid>
 								<TextField
 									className={classes.textField}
 									multiline
@@ -85,6 +135,7 @@ export class LandingPage extends React.Component {
 									InputProps={{
 										className: classes.input
 									}}
+									placeholder={"e.g. @material-ui/core:4.11.4"}
 								/>
 								<Button className={classes.button} variant={"contained"} color={"primary"}>
 									<Typography>Go</Typography>
