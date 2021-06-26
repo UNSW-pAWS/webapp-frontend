@@ -7,8 +7,6 @@ import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import SearchIcon from "@material-ui/icons/Search";
 import Paper from "@material-ui/core/Paper";
-import Draggable from "react-draggable";
-import { render } from "@testing-library/react";
 
 const styles = (theme) => ({
 	container: {
@@ -22,7 +20,7 @@ const styles = (theme) => ({
 	assetsContainer: {
 		marginTop: "1rem",
 		padding: "1rem",
-		// overflow: "auto",
+		overflow: "auto",
 		height: "calc(100% - 4rem)"
 	},
 	asset: {
@@ -37,8 +35,8 @@ export class AssetBar extends React.Component {
 		super(props);
 	}
 
-	handleState = () => {
-		React.cloneElement(<Paper />);
+	handleState = (event) => {
+		this.props.handleAddAsset(event.clientX, event.clientY);
 	};
 
 	render() {
@@ -58,21 +56,10 @@ export class AssetBar extends React.Component {
 					}}
 				/>
 				<Container key="assets-container" className={classes.assetsContainer}>
-					<Draggable>
-						<Paper elevation={3} className={classes.asset} onClick={this.handleStart}/>
-					</Draggable>
-					<Draggable>
-						<Paper elevation={3} className={classes.asset} />
-					</Draggable>
-					<Draggable>
-						<Paper elevation={3} className={classes.asset} />
-					</Draggable>
-					<Draggable>
-						<Paper elevation={3} className={classes.asset} />
-					</Draggable>
-					<Draggable>
-						<Paper elevation={3} className={classes.asset} />
-					</Draggable>
+					<Paper elevation={3} className={classes.asset} onMouseDown={this.handleState}/>
+					<Paper elevation={3} className={classes.asset} onMouseDown={this.handleState}/>
+					<Paper elevation={3} className={classes.asset} onMouseDown={this.handleState}/>
+					<Paper elevation={3} className={classes.asset} onMouseDown={this.handleState}/>
 				</Container>
 			</Container>
 		);
@@ -81,7 +68,8 @@ export class AssetBar extends React.Component {
 }
 
 AssetBar.propTypes = {
-	classes: PropTypes.object.isRequired
+	classes: PropTypes.object.isRequired,
+	handleAddAsset: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(AssetBar);
