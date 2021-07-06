@@ -14,12 +14,6 @@ const styles = (theme) => ({
 	bodyContainer: {
 		height: "calc(100vh - 5rem)"
 	},
-	canvasBase: {
-		backgroundColor: "#F2F2F2",
-		backgroundSize: "30px 30px",
-		backgroundImage: "linear-gradient(to right, grey 1px, transparent 1px), linear-gradient(to bottom, grey 1px, transparent 1px)",
-		backgroundRepeat: "repeat"
-	},
 	assetBarContainer: {
 		height: "100%"
 	},
@@ -36,7 +30,8 @@ export class LandingPage extends React.Component {
 		super(props);
         
 		this.state = {
-			assets: []
+			assets: [],
+			dragging: false
 		};
 	}
 
@@ -49,9 +44,9 @@ export class LandingPage extends React.Component {
 
 		const newAsset = React.createElement(
 			Draggable,
-			{style: {left: x, top: y}},
+			{style: {position: "fixed", left: `${x}px`, top: `${y}px`}},
 			React.createElement(Paper, { elevation: 3, className: classes.blockAsset })
-		)
+		);
 		this.setState({ assets: [...this.state.assets, newAsset] });
 	};
 
@@ -63,12 +58,12 @@ export class LandingPage extends React.Component {
 			<React.Fragment>
 				<Header />
 				<Grid container className={classes.bodyContainer}>
-					<Grid item xs={2} xl={1} className={classes.assetBarContainer}>
-						<AssetBar handleAddAsset={this.handleAddAsset}/>
+					<Grid item xs={3} xl={1} className={classes.assetBarContainer}>
+						<AssetBar toggleDragging={(val) => { this.setState({ dragging: val }); }}/>
 					</Grid>
-					<Grid item xs={10} xl={11} className={classes.canvasBase}>
-						<Canvas>
-							{ assets.map((a) => { return a })}
+					<Grid item xs={9} xl={11}>
+						<Canvas className="canvas">
+							{ assets.map((a) => { return a; })}
 						</Canvas>
 					</Grid>
 				</Grid>
