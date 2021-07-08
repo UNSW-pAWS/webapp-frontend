@@ -58,10 +58,10 @@ export class LandingPage extends React.Component {
 			<React.Fragment>
 				<Header />
 				<Grid container className={classes.bodyContainer}>
-					<Grid item xs={3} xl={1} className={classes.assetBarContainer}>
+					<Grid item xs={3} xl={2} className={classes.assetBarContainer}>
 						<AssetBar toggleDragging={(val) => { this.setState({ dragging: val }); }}/>
 					</Grid>
-					<Grid item xs={9} xl={11}>
+					<Grid item xs={9} xl={10}>
 						<Canvas className="canvas">
 							{ assets.map((a) => { return a; })}
 						</Canvas>

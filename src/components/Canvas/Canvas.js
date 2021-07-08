@@ -3,13 +3,12 @@ import PropTypes from "prop-types";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Paper from "@material-ui/core/Paper";
 
-import { Rnd } from "react-rnd";
+import { CanvasAsset } from "../CanvasAsset";
 
 const styles = (theme) => ({
 	base: {
-		width: "100%",
+		maxWidth: "100%",
 		height: "100%",
 		backgroundColor: "#F2F2F2",
 		backgroundSize: "30px 30px",
@@ -76,18 +75,7 @@ export class Canvas extends React.Component {
 				onDrop={this.onDrop}
 			>
 				{ assets.map((a) => {
-					return (
-						<Rnd
-							default={{
-								x: a.x,
-								y: a.y,
-								height: 80,
-								width: 80
-							}}
-						>
-							<Paper className={classes.asset}/>
-						</Rnd>
-					);
+					return <CanvasAsset metadata={a}/>;
 				}) }
 			</Container>
 		);
