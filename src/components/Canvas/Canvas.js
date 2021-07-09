@@ -3,10 +3,11 @@ import PropTypes from "prop-types";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import Xarrow from "react-xarrows";
 
 import { CanvasAsset } from "../CanvasAsset";
 
-const styles = (theme) => ({
+const styles = () => ({
 	base: {
 		maxWidth: "100%",
 		height: "100%",
@@ -28,7 +29,9 @@ export class Canvas extends React.Component {
 
 		this.state = {
 			mouseOver: false,
-			assets: []
+			assets: [],
+			arrows: [],
+			isArrowBeingDrawn: false
 		};
 	}
 
@@ -48,9 +51,11 @@ export class Canvas extends React.Component {
 	};
 
 	onDrop = (e) => {
-		this.addAsset(e.clientX - e.target.offsetLeft, e.clientY - e.target.offsetTop);
-		e.preventDefault();
-		e.stopPropagation();
+		if (e.dataTransfer.getData("string") === "asset") {
+			this.addAsset(e.clientX - e.target.offsetLeft, e.clientY - e.target.offsetTop);
+			e.preventDefault();
+			e.stopPropagation();
+		}
 	};
 
 	addAsset = (x, y) => {
@@ -62,9 +67,31 @@ export class Canvas extends React.Component {
 		this.setState({ assets: [...this.state.assets, newAsset] });
 	};
 
+	addArrow = (startRef, endRef) => {
+		const { arrows } = this.state;
+
+		const arrowId = arrows.length > 0 
+			? parseInt(arrows[arrows.length-1].id.split("-").pop()) + 1 
+			: 0;
+		const newArrow = {
+			id: `arrow-${arrowId}`,
+			startRef: startRef,
+			endRef: endRef
+		};
+
+		this.setState({ arrows: [...arrows, newArrow] });
+		return `arrow-${arrowId}`;
+	}
+
+	deleteArrow = (id) => {
+		this.setState((prevState) => ({
+			arrows: prevState.arrows.filter(a => a.id !== id)
+		}));
+	}
+
 	render() {
 		const { classes } = this.props;
-		const { assets } = this.state;
+		const { assets, arrows, isArrowBeingDrawn } = this.state;
 
 		return (
 			<Container
@@ -75,7 +102,20 @@ export class Canvas extends React.Component {
 				onDrop={this.onDrop}
 			>
 				{ assets.map((a) => {
-					return <CanvasAsset metadata={a}/>;
+					return (
+						<CanvasAsset
+							metadata={a}
+							isArrowBeingDrawn={isArrowBeingDrawn}
+							toggleArrowDrawn={() => {
+								this.setState({ isArrowBeingDrawn: !isArrowBeingDrawn });
+							}}
+							addArrow={this.addArrow}
+							deleteArrow={this.deleteArrow}
+						/>
+					);
+				}) }
+				{ arrows.map((a) => {
+					return <Xarrow start={a.startRef} end={a.endRef} />;
 				}) }
 			</Container>
 		);

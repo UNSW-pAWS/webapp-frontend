@@ -10,7 +10,7 @@ import { Header } from "../../components/Header";
 import { AssetBar } from "../../components/AssetBar";
 import { Canvas } from "../../components/Canvas";
 
-const styles = (theme) => ({
+const styles = () => ({
 	bodyContainer: {
 		height: "calc(100vh - 5rem)"
 	},

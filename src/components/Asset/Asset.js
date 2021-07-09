@@ -14,9 +14,13 @@ const styles = () => ({
 
 export function Asset({ classes }) {
 
+	const onDragStart = (e) => {
+		e.dataTransfer.setData("string", "asset");
+	};
+
 	return (
 		<React.Fragment>
-			<Paper elevation={3} className={classes.asset} draggable={"true"}/>
+			<Paper elevation={3} className={classes.asset} onDragStart={onDragStart} draggable/>
 		</React.Fragment>
 	);
 
