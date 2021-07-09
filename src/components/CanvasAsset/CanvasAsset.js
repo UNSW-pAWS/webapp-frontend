@@ -65,7 +65,6 @@ export class CanvasAsset extends React.Component {
 				bottom: {},
 				left: {}
 			},
-			arrowDragging: false,
 			offset: {
 				left: this.props.metadata.x - 30,
 				top: this.props.metadata.y - 30
@@ -112,8 +111,8 @@ export class CanvasAsset extends React.Component {
 	}
 
 	render() {
-		const { classes, metadata } = this.props;
-		const { hovered, arrowHovered, arrowDragging, offset } = this.state;
+		const { classes, metadata, isArrowBeingDrawn, toggleArrowDrawn } = this.props;
+		const { hovered, arrowHovered, offset } = this.state;
 
 		return (
 			<React.Fragment>
@@ -146,7 +145,7 @@ export class CanvasAsset extends React.Component {
 						onMouseLeave={() => { this.setState({ hovered: false }); }}
 					>
 						<Paper
-							className={clsx(classes.asset, arrowDragging && classes.assetBorderGlow)}
+							className={clsx(classes.asset, isArrowBeingDrawn && classes.assetBorderGlow)}
 							onDragEnter={this.onDragEnter}
 							onDragOver={this.onDragOver}
 							onDragLeave={this.onDragLeave}
@@ -159,9 +158,7 @@ export class CanvasAsset extends React.Component {
 									toggleArrowHovered={() => {
 										this.setState({ arrowHovered: !arrowHovered });
 									}}
-									toggleArrowDragging={() => {
-										this.setState({ arrowDragging: !arrowDragging });
-									}}
+									toggleArrowDragging={toggleArrowDrawn}
 									offset={offset}
 								/>
 								<RightArrowHandler
@@ -169,9 +166,7 @@ export class CanvasAsset extends React.Component {
 									toggleArrowHovered={() => {
 										this.setState({ arrowHovered: !arrowHovered });
 									}}
-									toggleArrowDragging={() => {
-										this.setState({ arrowDragging: !arrowDragging });
-									}}
+									toggleArrowDragging={toggleArrowDrawn}
 									offset={offset}
 								/>
 								<BottomArrowHandler
@@ -179,9 +174,7 @@ export class CanvasAsset extends React.Component {
 									toggleArrowHovered={() => {
 										this.setState({ arrowHovered: !arrowHovered });
 									}}
-									toggleArrowDragging={() => {
-										this.setState({ arrowDragging: !arrowDragging });
-									}}
+									toggleArrowDragging={toggleArrowDrawn}
 									offset={offset}
 								/>
 								<LeftArrowHandler
@@ -189,9 +182,7 @@ export class CanvasAsset extends React.Component {
 									toggleArrowHovered={() => {
 										this.setState({ arrowHovered: !arrowHovered });
 									}}
-									toggleArrowDragging={() => {
-										this.setState({ arrowDragging: !arrowDragging });
-									}}
+									toggleArrowDragging={toggleArrowDrawn}
 									offset={offset}
 								/>
 							</>
