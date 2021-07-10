@@ -3,15 +3,13 @@ import PropTypes from "prop-types";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Paper from "@material-ui/core/Paper";
+import Xarrow from "react-xarrows";
 
-import { Rnd } from "react-rnd";
+import { CanvasAsset } from "../CanvasAsset";
 
-import { Asset2 } from "../Asset2";
-
-const styles = (theme) => ({
+const styles = () => ({
 	base: {
-		width: "100%",
+		maxWidth: "100%",
 		height: "100%",
 		backgroundColor: "#F2F2F2",
 		backgroundSize: "30px 30px",
@@ -31,7 +29,9 @@ export class Canvas extends React.Component {
 
 		this.state = {
 			mouseOver: false,
-			assets: []
+			assets: [],
+			arrows: [],
+			isArrowBeingDrawn: false
 		};
 	}
 
@@ -51,13 +51,20 @@ export class Canvas extends React.Component {
 	};
 
 	onDrop = (e) => {
-		this.addAsset(e.clientX - e.target.offsetLeft, e.clientY - e.target.offsetTop);
-		e.preventDefault();
-		e.stopPropagation();
+		if (e.dataTransfer.getData("string") === "asset") {
+			this.addAsset(e.clientX - e.target.offsetLeft, e.clientY - e.target.offsetTop);
+			e.preventDefault();
+			e.stopPropagation();
+		}
 	};
 
 	addAsset = (x, y) => {
+		const { assets } = this.state;
+		const assetId = assets.length > 0 
+			? parseInt(assets[assets.length-1].id.split("-").pop()) + 1 
+			: 0;
 		const newAsset = {
+			id: `asset-${assetId}`,
 			x: x,
 			y: y
 		};
@@ -65,9 +72,31 @@ export class Canvas extends React.Component {
 		this.setState({ assets: [...this.state.assets, newAsset] });
 	};
 
+	addArrow = (startRef, endRef) => {
+		const { arrows } = this.state;
+
+		const arrowId = arrows.length > 0 
+			? parseInt(arrows[arrows.length-1].id.split("-").pop()) + 1 
+			: 0;
+		const newArrow = {
+			id: `arrow-${arrowId}`,
+			startRef: startRef,
+			endRef: endRef
+		};
+
+		this.setState({ arrows: [...arrows, newArrow] });
+		return `arrow-${arrowId}`;
+	}
+
+	deleteArrow = (id) => {
+		this.setState((prevState) => ({
+			arrows: prevState.arrows.filter(a => a.id !== id)
+		}));
+	}
+
 	render() {
 		const { classes } = this.props;
-		const { assets } = this.state;
+		const { assets, arrows, isArrowBeingDrawn, isAssetBeingDragged } = this.state;
 
 		return (
 			<Container
@@ -80,17 +109,24 @@ export class Canvas extends React.Component {
 			>
 				{ assets.map((a) => {
 					return (
-						<Rnd
-							default={{
-								x: a.x,
-								y: a.y,
-								height: 80,
-								width: 80
+						<CanvasAsset
+							key={a.id}
+							id={a.id}
+							metadata={a}
+							isArrowBeingDrawn={isArrowBeingDrawn}
+							toggleArrowDrawn={() => {
+								this.setState({ isArrowBeingDrawn: !isArrowBeingDrawn });
 							}}
-						>
-							<Asset2/>
-						</Rnd>
+							addArrow={this.addArrow}
+							deleteArrow={this.deleteArrow}
+							toggleAssetBeingDragged={() => {
+								this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
+							}}
+						/>
 					);
+				}) }
+				{ arrows.map((a) => {
+					return <Xarrow key={a.id} id={a.id} start={a.startRef} end={a.endRef} />;
 				}) }
 			</Container>
 		);
