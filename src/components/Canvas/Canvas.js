@@ -7,6 +7,8 @@ import Paper from "@material-ui/core/Paper";
 
 import { Rnd } from "react-rnd";
 
+import { Asset2 } from "../Asset2";
+
 const styles = (theme) => ({
 	base: {
 		width: "100%",
@@ -73,6 +75,7 @@ export class Canvas extends React.Component {
 				onDragEnter={this.onDragEnter}
 				onDragOver={this.onDragOver}
 				onDragLeave={this.onDragLeave}
+				onDragEnd={this.onDragEnd}
 				onDrop={this.onDrop}
 			>
 				{ assets.map((a) => {
@@ -85,7 +88,7 @@ export class Canvas extends React.Component {
 								width: 80
 							}}
 						>
-							<Paper className={classes.asset}/>
+							<Asset2/>
 						</Rnd>
 					);
 				}) }
