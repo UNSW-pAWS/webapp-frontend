@@ -24,28 +24,6 @@ const styles = () => ({
 	asset: {
 		height: "80%",
 		width: "80%"
-	},
-	topArrow: {
-		position: "absolute",
-		top: 0,
-		marginTop: "-12px"
-	},
-	rightArrow: {
-		position: "absolute",
-		right: 0,
-		marginRight: "-12px"
-	},
-	bottomArrow: {
-		position: "absolute",
-		transform: "rotate(90deg)",
-		bottom: 0,
-		marginBottom: "-12px"
-	},
-	leftArrow: {
-		position: "absolute",
-		transform: "rotate(180deg)",
-		left: 0,
-		marginLeft: "-12px"
 	}
 });
 
@@ -72,12 +50,18 @@ export class CanvasAsset extends React.Component {
 		};
 	}
 
-	onDragEnter = (e) => {
-		e.preventDefault();
-		e.stopPropagation();
+	onResize = (e, dir, refToElement, delta, position) => {
+		this.props.toggleAssetBeingDragged();
+		this.setState({
+			offset: {
+				left: position.x,
+				top: position.y
+			}
+		});
 	};
 
 	onDrag = (_, data) => {
+		this.props.toggleAssetBeingDragged();
 		this.setState({
 			offset: {
 				left: this.state.offset.left + data.deltaX,
@@ -86,9 +70,12 @@ export class CanvasAsset extends React.Component {
 		});
 	};
 
+	onDragEnter = (e) => {
+		e.preventDefault();
+	};
+
 	onDragOver = (e) => {
 		e.preventDefault();
-		e.stopPropagation();
 	};
 
 	onDragLeave = (e) => {
@@ -97,21 +84,13 @@ export class CanvasAsset extends React.Component {
 	};
 
 	onDrop = (e) => {
+		this.props.addArrow(e.dataTransfer.getData("parent"), this.componentRef);
 		e.preventDefault();
 		e.stopPropagation();
 	};
 
-	onResize = (e, dir, refToElement, delta, position) => {
-		this.setState({
-			offset: {
-				left: position.x,
-				top: position.y
-			}
-		});
-	}
-
 	render() {
-		const { classes, metadata, isArrowBeingDrawn, toggleArrowDrawn } = this.props;
+		const { classes, id, metadata, isArrowBeingDrawn, toggleArrowDrawn } = this.props;
 		const { hovered, arrowHovered, offset } = this.state;
 
 		return (
@@ -144,16 +123,10 @@ export class CanvasAsset extends React.Component {
 						onMouseEnter={() => { this.setState({ hovered: true }); }} 
 						onMouseLeave={() => { this.setState({ hovered: false }); }}
 					>
-						<Paper
-							className={clsx(classes.asset, isArrowBeingDrawn && classes.assetBorderGlow)}
-							onDragEnter={this.onDragEnter}
-							onDragOver={this.onDragOver}
-							onDragLeave={this.onDragLeave}
-							onDrop={this.onDrop}
-						/>
 						{ hovered && (
-							<>
+							<div className={classes.arrowContainer}>
 								<TopArrowHandler
+									componentId={id}
 									componentRef={this.componentRef}
 									toggleArrowHovered={() => {
 										this.setState({ arrowHovered: !arrowHovered });
@@ -162,6 +135,7 @@ export class CanvasAsset extends React.Component {
 									offset={offset}
 								/>
 								<RightArrowHandler
+									componentId={id}
 									componentRef={this.componentRef}
 									toggleArrowHovered={() => {
 										this.setState({ arrowHovered: !arrowHovered });
@@ -170,6 +144,7 @@ export class CanvasAsset extends React.Component {
 									offset={offset}
 								/>
 								<BottomArrowHandler
+									componentId={id}
 									componentRef={this.componentRef}
 									toggleArrowHovered={() => {
 										this.setState({ arrowHovered: !arrowHovered });
@@ -178,6 +153,7 @@ export class CanvasAsset extends React.Component {
 									offset={offset}
 								/>
 								<LeftArrowHandler
+									componentId={id}
 									componentRef={this.componentRef}
 									toggleArrowHovered={() => {
 										this.setState({ arrowHovered: !arrowHovered });
@@ -185,8 +161,16 @@ export class CanvasAsset extends React.Component {
 									toggleArrowDragging={toggleArrowDrawn}
 									offset={offset}
 								/>
-							</>
+							</div>
 						)}
+						<Paper
+							id={id}
+							className={clsx(classes.asset, isArrowBeingDrawn && classes.assetBorderGlow)}
+							onDragEnter={this.onDragEnter}
+							onDragOver={this.onDragOver}
+							onDragLeave={this.onDragLeave}
+							onDrop={this.onDrop}
+						/>
 					</div>
 				</Rnd>
 			</React.Fragment>
@@ -197,11 +181,13 @@ export class CanvasAsset extends React.Component {
 
 CanvasAsset.propTypes = {
 	classes: PropTypes.object.isRequired,
+	id: PropTypes.string.isRequired,
 	metadata: PropTypes.object.isRequired,
 	toggleArrowDrawn: PropTypes.func.isRequired,
 	isArrowBeingDrawn: PropTypes.bool.isRequired,
 	addArrow: PropTypes.func.isRequired,
-	deleteArrow: PropTypes.func.isRequired
+	deleteArrow: PropTypes.func.isRequired,
+	toggleAssetBeingDragged: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(CanvasAsset);

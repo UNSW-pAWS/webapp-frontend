@@ -10,26 +10,27 @@ const styles = () => ({
 		color: "rgb(52, 85, 235, 0.3)",
 		position: "absolute",
 		bottom: 0,
-		marginBottom: "-12px",
+		margin: "0 25% -12px",
 		"&:hover": {
 			color: "rgb(52, 85, 235, 0.8)"
 		}
 	}
 });
 
-function TopArrowHandler({ classes, componentRef, toggleArrowHovered, toggleArrowDragging, offset }) {
+function TopArrowHandler({ classes, componentId, componentRef, toggleArrowHovered, toggleArrowDragging, offset }) {
 	const ref = React.createRef();
 	const [isBeingDragged, setIsBeingDragged] = React.useState(false);
 	const [position, setPosition] = React.useState({});
 
-	const onDragStart = () => {
+	const onDragStart = (e) => {
+		e.dataTransfer.setData("parent", componentId);
 		toggleArrowDragging();
 		setIsBeingDragged(true);
 	};
 
 	const onDrag = (e) => {
-		const x = e.clientX - e.target.parentElement.parentElement.parentElement.offsetLeft - offset.left;
-		const y = e.clientY - e.target.parentElement.parentElement.parentElement.offsetTop - offset.top;
+		const x = e.clientX - e.target.parentElement.parentElement.parentElement.parentElement.offsetLeft - offset.left;
+		const y = e.clientY - e.target.parentElement.parentElement.parentElement.parentElement.offsetTop - offset.top;
 		setPosition({
 			position: "absolute",
 			left: x + "px",
@@ -70,7 +71,8 @@ TopArrowHandler.propTypes = {
 	componentRef: PropTypes.object.isRequired,
 	toggleArrowHovered: PropTypes.func.isRequired,
 	toggleArrowDragging: PropTypes.func.isRequired,
-	offset: PropTypes.object.isRequired
+	offset: PropTypes.object.isRequired,
+	componentId: PropTypes.string.isRequired
 };
 
 export default withStyles(styles)(TopArrowHandler);

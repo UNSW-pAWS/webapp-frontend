@@ -59,7 +59,12 @@ export class Canvas extends React.Component {
 	};
 
 	addAsset = (x, y) => {
+		const { assets } = this.state;
+		const assetId = assets.length > 0 
+			? parseInt(assets[assets.length-1].id.split("-").pop()) + 1 
+			: 0;
 		const newAsset = {
+			id: `asset-${assetId}`,
 			x: x,
 			y: y
 		};
@@ -91,7 +96,7 @@ export class Canvas extends React.Component {
 
 	render() {
 		const { classes } = this.props;
-		const { assets, arrows, isArrowBeingDrawn } = this.state;
+		const { assets, arrows, isArrowBeingDrawn, isAssetBeingDragged } = this.state;
 
 		return (
 			<Container
@@ -104,6 +109,8 @@ export class Canvas extends React.Component {
 				{ assets.map((a) => {
 					return (
 						<CanvasAsset
+							key={a.id}
+							id={a.id}
 							metadata={a}
 							isArrowBeingDrawn={isArrowBeingDrawn}
 							toggleArrowDrawn={() => {
@@ -111,11 +118,14 @@ export class Canvas extends React.Component {
 							}}
 							addArrow={this.addArrow}
 							deleteArrow={this.deleteArrow}
+							toggleAssetBeingDragged={() => {
+								this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
+							}}
 						/>
 					);
 				}) }
 				{ arrows.map((a) => {
-					return <Xarrow start={a.startRef} end={a.endRef} />;
+					return <Xarrow key={a.id} id={a.id} start={a.startRef} end={a.endRef} />;
 				}) }
 			</Container>
 		);

@@ -3,8 +3,6 @@ import PropTypes from "prop-types";
 
 import { withStyles } from "@material-ui/styles";
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import Draggable from "react-draggable";
 
 import { Header } from "../../components/Header";
 import { AssetBar } from "../../components/AssetBar";
@@ -34,21 +32,6 @@ export class LandingPage extends React.Component {
 			dragging: false
 		};
 	}
-
-	componentDidMount() {
-
-	}
-
-	handleAddAsset = (x, y) => {
-		const { classes } = this.props;
-
-		const newAsset = React.createElement(
-			Draggable,
-			{style: {position: "fixed", left: `${x}px`, top: `${y}px`}},
-			React.createElement(Paper, { elevation: 3, className: classes.blockAsset })
-		);
-		this.setState({ assets: [...this.state.assets, newAsset] });
-	};
 
 	render() {
 		const { classes } = this.props;
