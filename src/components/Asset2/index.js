@@ -1,1 +1,0 @@
-export { default as Asset2 } from "./Asset2";

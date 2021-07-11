@@ -7,6 +7,10 @@ import Paper from "@material-ui/core/Paper";
 import { Rnd } from "react-rnd";
 
 import { TopArrowHandler, RightArrowHandler, BottomArrowHandler, LeftArrowHandler } from "../ArrowHandlers";
+import { Grid, Tooltip } from "@material-ui/core";
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { IconButton } from "@material-ui/core";
+import { Drawer } from "../Drawer";
 
 const styles = () => ({
 	assetOverlay: {
@@ -28,7 +32,6 @@ const styles = () => ({
 });
 
 export class CanvasAsset extends React.Component {
-
 	constructor(props) {
 		super(props);
 
@@ -88,6 +91,14 @@ export class CanvasAsset extends React.Component {
 		e.preventDefault();
 		e.stopPropagation();
 	};
+
+	toggleDrawer = (anchor, open) => (event) => {
+		if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+		  return;
+		}
+	
+		setState({ ...state, [anchor]: open });
+	  };
 
 	render() {
 		const { classes, id, metadata, isArrowBeingDrawn, toggleArrowDrawn } = this.props;
@@ -163,6 +174,7 @@ export class CanvasAsset extends React.Component {
 								/>
 							</div>
 						)}
+						
 						<Paper
 							id={id}
 							className={clsx(classes.asset, isArrowBeingDrawn && classes.assetBorderGlow)}
@@ -170,7 +182,15 @@ export class CanvasAsset extends React.Component {
 							onDragOver={this.onDragOver}
 							onDragLeave={this.onDragLeave}
 							onDrop={this.onDrop}
-						/>
+						>
+							<Tooltip title="Open menu">
+								<Grid  item xs={1}>
+									<IconButton size="small">
+										<ArrowDropDownIcon fontSize="inherit"/>
+									</IconButton>
+								</Grid>
+							</Tooltip>
+						</Paper>
 					</div>
 				</Rnd>
 			</React.Fragment>
