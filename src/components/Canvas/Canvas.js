@@ -6,6 +6,15 @@ import Container from "@material-ui/core/Container";
 import Xarrow from "react-xarrows";
 
 import { CanvasAsset } from "../CanvasAsset";
+import { Button, Drawer, Grid } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
+import { FormControl } from "@material-ui/core";
+import { InputLabel } from "@material-ui/core";
+import { FilledInput } from "@material-ui/core";
+import { InputAdornment } from "@material-ui/core";
+
+const drawerWidth = "50%";
+const animationScale = 1;
 
 const styles = () => ({
 	base: {
@@ -19,7 +28,15 @@ const styles = () => ({
 	asset: {
 		height: "100%",
 		width: "100%"
+	}, 
+	drawerStyle: {
+		width: drawerWidth,
+		padding: "2rem",
+	},
+	textBoxStyle: {
+		margin: "auto"
 	}
+
 });
 
 export class Canvas extends React.Component {
@@ -31,7 +48,8 @@ export class Canvas extends React.Component {
 			mouseOver: false,
 			assets: [],
 			arrows: [],
-			isArrowBeingDrawn: false
+			isArrowBeingDrawn: false,
+			menuOpen: false
 		};
 	}
 
@@ -48,6 +66,7 @@ export class Canvas extends React.Component {
 	onDragLeave = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
+		this.setDrawer(false);
 	};
 
 	onDrop = (e) => {
@@ -68,7 +87,7 @@ export class Canvas extends React.Component {
 			x: x,
 			y: y
 		};
-
+		this.setDrawer(false);
 		this.setState({ assets: [...this.state.assets, newAsset] });
 	};
 
@@ -94,11 +113,56 @@ export class Canvas extends React.Component {
 		}));
 	}
 
+	setDrawer = (isOpen) => {
+		const { menuOpen } = this.state;
+			this.setState({ menuOpen: isOpen });
+			console.log(isOpen);
+		return;
+	};
+
+	sleep = (milliseconds) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds))
+    }
+
+	setDrawerButton = () => {
+		const { menuOpen } = this.state;
+		if(menuOpen == true) {
+			this.setDrawer(false);
+			this.sleep(200 * animationScale).then(r => {
+				this.setDrawer(true);
+			})
+			
+		}
+		else if(menuOpen == false) {
+			this.setDrawer(true);
+		}
+		
+	};
+
+	DrawerContents = () => (
+		<div className={this.props.classes.drawerStyle}>
+			<h1>
+				Package checker
+			</h1>
+			<Grid item xs={12}>
+				<FormControl fullWidth className={this.props.classes.margin} variant="filled">
+					<InputLabel htmlFor="package checker">Package Checker</InputLabel>
+					<FilledInput
+					/>
+        		</FormControl>
+			</Grid>
+				<Button>
+					<p>check packages</p>
+				</Button>
+		</div>
+	);
+
 	render() {
 		const { classes } = this.props;
-		const { assets, arrows, isArrowBeingDrawn, isAssetBeingDragged } = this.state;
+		const { assets, arrows, isArrowBeingDrawn, isAssetBeingDragged, menuOpen } = this.state;
 
 		return (
+			
 			<Container
 				className={classes.base}
 				onDragEnter={this.onDragEnter}
@@ -106,9 +170,20 @@ export class Canvas extends React.Component {
 				onDragLeave={this.onDragLeave}
 				onDragEnd={this.onDragEnd}
 				onDrop={this.onDrop}
+				
 			>
+				<Drawer anchor="right"
+				variant="persistent"
+				open={menuOpen}
+				onClose={() => this.setDrawer(false)}
+				className={classes.drawerStyle}
+				>
+					{this.DrawerContents()}
+				</Drawer>
+
 				{ assets.map((a) => {
 					return (
+						
 						<CanvasAsset
 							key={a.id}
 							id={a.id}
@@ -122,6 +197,8 @@ export class Canvas extends React.Component {
 							toggleAssetBeingDragged={() => {
 								this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
 							}}
+							setDrawerButton={this.setDrawerButton}
+							menuOpen={this.state.menuOpen}
 						/>
 					);
 				}) }
@@ -129,6 +206,7 @@ export class Canvas extends React.Component {
 					return <Xarrow key={a.id} id={a.id} start={a.startRef} end={a.endRef} />;
 				}) }
 			</Container>
+			
 		);
 	}
 
