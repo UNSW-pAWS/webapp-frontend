@@ -16,15 +16,12 @@ const theme = createMuiTheme({
 		contrastThreshold: 3
 	},
 	typography: {
-		allVariants: {
-			color: "#FFFFFF"
-		}
 	}
 });
 
 function App() {
 	return (
-		<div className="App">
+		<div className="App" style={{ height: "100vh" }}>
 			<ThemeProvider theme={theme}>
 				<LandingPage />
 			</ThemeProvider>

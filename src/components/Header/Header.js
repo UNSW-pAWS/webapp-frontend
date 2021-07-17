@@ -8,8 +8,11 @@ import Typography from "@material-ui/core/Typography";
 
 const styles = (theme) => ({
 	appBar: {
-		backgroundColor: "#121212",
-		padding: "1rem"
+		backgroundColor: "#FFFFFF",
+		padding: "0.25rem",
+		borderBottomWidth: "2px",
+		borderBottomStyle: "solid",
+		borderBottomColor: theme.palette.primary.main
 	},
 	name: {
 		fontWeight: "bold",
@@ -34,7 +37,7 @@ export function Header({ classes }) {
 			<Toolbar>
 				<Typography className={classes.name} variant={"h4"}>pAWS</Typography>
 				<Typography className={classes.bar} variant={"h5"}>  |  </Typography>
-				<Typography className={classes.appName} variant={"h6"}>Dependency Checker</Typography>
+				<Typography className={classes.appName} variant={"h6"}>Design and Configuration Tool</Typography>
 			</Toolbar>
 		</AppBar>
 	);
