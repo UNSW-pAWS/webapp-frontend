@@ -88,14 +88,12 @@ export class CanvasAsset extends React.Component {
 	onDragLeave = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
-		console.log("1");
 	};
 
 	onDrop = (e) => {
 		this.props.addArrow(e.dataTransfer.getData("parent"), this.componentRef);
 		e.preventDefault();
 		e.stopPropagation();
-		console.log("1");
 	};
 
 	render() {
@@ -183,7 +181,7 @@ export class CanvasAsset extends React.Component {
 						>
 							<Tooltip title="Open menu">
 								<Grid  item xs={1}>
-									<IconButton size="small" onClick={() => this.props.setDrawerButton()}>
+									<IconButton size="small" onClick={() => this.props.setDrawerButton(this.props.id)}>
 										<ArrowDropDownIcon fontSize="inherit"/>
 									</IconButton>
 								</Grid>

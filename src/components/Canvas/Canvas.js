@@ -7,14 +7,14 @@ import Xarrow from "react-xarrows";
 
 import { CanvasAsset } from "../CanvasAsset";
 import { Button, Drawer, Grid } from "@material-ui/core";
-import { TextField } from "@material-ui/core";
 import { FormControl } from "@material-ui/core";
 import { InputLabel } from "@material-ui/core";
 import { FilledInput } from "@material-ui/core";
-import { InputAdornment } from "@material-ui/core";
 
-const drawerWidth = "50%";
+const drawerWidth = 500;
 const animationScale = 1;
+var prevAssetID = "asset-0";
+var currAssetID;
 
 const styles = () => ({
 	base: {
@@ -115,8 +115,7 @@ export class Canvas extends React.Component {
 
 	setDrawer = (isOpen) => {
 		const { menuOpen } = this.state;
-			this.setState({ menuOpen: isOpen });
-			console.log(isOpen);
+		this.setState({ menuOpen: isOpen });
 		return;
 	};
 
@@ -124,30 +123,45 @@ export class Canvas extends React.Component {
         return new Promise(resolve => setTimeout(resolve, milliseconds))
     }
 
-	setDrawerButton = () => {
+	setDrawerButton = (id) => {
 		const { menuOpen } = this.state;
-		if(menuOpen == true) {
+
+		var currID = 0;
+		var prevID = 0;
+
+		// extracts the integer ID from assetID
+		currID = id.match(/\d/g);
+		currID = parseInt(currID.join(""));
+
+		prevID = prevAssetID.match(/\d/g);
+		prevID = parseInt(prevID.join(""));
+
+		//console.log(currID + " " + prevID);
+
+		if(currID != prevID && menuOpen == true) {
+			//flash refresh of drawer
 			this.setDrawer(false);
-			this.sleep(200 * animationScale).then(r => {
-				this.setDrawer(true);
-			})
-			
-		}
-		else if(menuOpen == false) {
 			this.setDrawer(true);
 		}
-		
+		else {
+			this.setDrawer(!menuOpen);
+		}
+		currAssetID = id;
+		prevAssetID = currAssetID;
 	};
 
 	DrawerContents = () => (
 		<div className={this.props.classes.drawerStyle}>
 			<h1>
-				Package checker
+				{currAssetID}
 			</h1>
 			<Grid item xs={12}>
-				<FormControl fullWidth className={this.props.classes.margin} variant="filled">
-					<InputLabel htmlFor="package checker">Package Checker</InputLabel>
+				<FormControl fullWidth variant="filled">
+					<InputLabel htmlFor="package checker">
+						Package Checker
+					</InputLabel>
 					<FilledInput
+						variant="filled"
 					/>
         		</FormControl>
 			</Grid>
@@ -170,7 +184,6 @@ export class Canvas extends React.Component {
 				onDragLeave={this.onDragLeave}
 				onDragEnd={this.onDragEnd}
 				onDrop={this.onDrop}
-				
 			>
 				<Drawer anchor="right"
 				variant="persistent"
@@ -198,7 +211,6 @@ export class Canvas extends React.Component {
 								this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
 							}}
 							setDrawerButton={this.setDrawerButton}
-							menuOpen={this.state.menuOpen}
 						/>
 					);
 				}) }
