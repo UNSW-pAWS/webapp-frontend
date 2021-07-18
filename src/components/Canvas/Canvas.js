@@ -6,13 +6,11 @@ import Container from "@material-ui/core/Container";
 import Xarrow from "react-xarrows";
 
 import { CanvasAsset } from "../CanvasAsset";
-import { Button, Drawer, Grid } from "@material-ui/core";
-import { FormControl } from "@material-ui/core";
-import { InputLabel } from "@material-ui/core";
-import { FilledInput } from "@material-ui/core";
+import { Button, Drawer, Grid, TextField } from "@material-ui/core";
+import { AppBar } from "@material-ui/core";
+import { Tabs } from "@material-ui/core";
 
 const drawerWidth = 500;
-const animationScale = 1;
 var prevAssetID = "asset-0";
 var currAssetID;
 
@@ -33,8 +31,11 @@ const styles = () => ({
 		width: drawerWidth,
 		padding: "2rem",
 	},
-	textBoxStyle: {
-		margin: "auto"
+	headingStyle: {
+		textAlign: "left",
+	},
+	buttonStyle: {
+		textAlign: "left"
 	}
 
 });
@@ -152,22 +153,44 @@ export class Canvas extends React.Component {
 
 	DrawerContents = () => (
 		<div className={this.props.classes.drawerStyle}>
-			<h1>
+			<AppBar position="static">
+			<Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
+				<Tab label="Item One" {...a11yProps(0)} />
+				<Tab label="Item Two" {...a11yProps(1)} />
+				<Tab label="Item Three" {...a11yProps(2)} />
+			</Tabs>
+			</AppBar>
+			<TabPanel value={value} index={0}>
+			Item One
+			</TabPanel>
+			<TabPanel value={value} index={1}>
+			Item Two
+			</TabPanel>
+			<TabPanel value={value} index={2}>
+			Item Three
+			</TabPanel>
+			<h2 className={this.props.classes.headingStyle}>
 				{currAssetID}
-			</h1>
+			</h2>
 			<Grid item xs={12}>
-				<FormControl fullWidth variant="filled">
-					<InputLabel htmlFor="package checker">
-						Package Checker
-					</InputLabel>
-					<FilledInput
-						variant="filled"
-					/>
-        		</FormControl>
+				<TextField
+					fullWidth
+					variant="outlined"
+					placeholder="Enter your package names"
+					multiline
+					rows={10}
+					rowsMax={10}
+				/>
 			</Grid>
-				<Button>
-					<p>check packages</p>
+			<p></p>
+			<div className={this.props.classes.buttonStyle}>
+				<Button 
+					size="medium"
+					variant="contained"
+				>
+					{"check packages"}
 				</Button>
+			</div>
 		</div>
 	);
 
