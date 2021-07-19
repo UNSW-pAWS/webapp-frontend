@@ -1,12 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
+import _ from "lodash";
 
 import { withStyles } from "@material-ui/styles";
 import Grid from "@material-ui/core/Grid";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import SyncAltIcon from "@material-ui/icons/SyncAlt";
+
+import { SUPPORTED_RESOURCES } from "../../resources/SupportedResources";
 
 import { Asset } from "../Asset";
 import { ComputeSvg } from "../../icons/ComputeSvg";
@@ -59,8 +61,31 @@ export class AssetBar extends React.Component {
 		this.setState({ currentTab: newTab });
 	};
 
+	renderTab = (type) => {
+		const { toggleDragging } = this.props;
+		const resources = SUPPORTED_RESOURCES.filter(r => r.type === type);
+
+		return (
+			_.chunk(resources, 2).map((pair) => {
+				return (
+					<Grid container item key={`pair-${pair[0].name}`}>
+						{
+							pair.map((r) => {
+								return (
+									<Grid container item xs={6} key={r.name}>
+										<Asset toggleDragging={toggleDragging} name={r.name}/>
+									</Grid>
+								);
+							})
+						}
+					</Grid>
+				);
+			})
+		);
+	}
+
 	render() {
-		const { classes, toggleDragging } = this.props;
+		const { classes } = this.props;
 		const { currentTab } = this.state;
 
 		return (
@@ -82,34 +107,10 @@ export class AssetBar extends React.Component {
 						<Tab className={clsx(classes.tab, currentTab === "database" && classes.activeTab)} icon={<DatabaseSvg />} value={"database"}/>
 						<Tab className={clsx(classes.tab, currentTab === "storage" && classes.activeTab)} icon={<StorageSvg />} value={"storage"}/>
 						<Tab className={clsx(classes.tab, currentTab === "network" && classes.activeTab)} icon={<NetworkSvg />} value={"network"}/>
-						<Tab className={clsx(classes.tab, currentTab === "connector" && classes.activeTab)} icon={<SyncAltIcon />} value={"connector"}/>
 					</Tabs>
 				</Grid>
 				<Grid container item xs={9} direction={"column"}>
-					<Grid container item>
-						<Grid container item xs={6}>
-							<Asset toggleDragging={toggleDragging}/>
-						</Grid>
-						<Grid container item xs={6}>
-							<Asset toggleDragging={toggleDragging}/>
-						</Grid>
-					</Grid>
-					<Grid container item>
-						<Grid container item xs={6}>
-							<Asset toggleDragging={toggleDragging}/>
-						</Grid>
-						<Grid container item xs={6}>
-							<Asset toggleDragging={toggleDragging}/>
-						</Grid>
-					</Grid>
-					<Grid container item>
-						<Grid container item xs={6}>
-							<Asset toggleDragging={toggleDragging}/>
-						</Grid>
-						<Grid container item xs={6}>
-							<Asset toggleDragging={toggleDragging}/>
-						</Grid>
-					</Grid>
+					{ this.renderTab(currentTab) }
 				</Grid>
 			</Grid>
 		);

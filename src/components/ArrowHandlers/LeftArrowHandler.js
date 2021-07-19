@@ -10,14 +10,15 @@ const styles = () => ({
 		color: "rgb(52, 85, 235, 0.3)",
 		position: "absolute",
 		left: 0,
-		margin: "-15% 0 0 -12px",
+		marginLeft: "-16px",
+		marginTop: "42px",
 		"&:hover": {
 			color: "rgb(52, 85, 235, 0.8)"
 		}
 	}
 });
 
-function TopArrowHandler({ classes, componentId, componentRef, toggleArrowHovered, toggleArrowDragging, offset }) {
+function LeftArrowHandler({ classes, componentId, componentRef, toggleArrowHovered, toggleArrowDragging, offset, parentSize }) {
 	const ref = React.createRef();
 	const [isBeingDragged, setIsBeingDragged] = React.useState(false);
 	const [position, setPosition] = React.useState({});
@@ -49,7 +50,10 @@ function TopArrowHandler({ classes, componentId, componentRef, toggleArrowHovere
 		<React.Fragment>
 			<div
 				ref={ref}
-				style={{...position}}
+				style={{
+					...position,
+					marginTop: `${(parentSize.height-39)/2}px`
+				}}
 				className={classes.arrow}
 				onMouseEnter={toggleArrowHovered}
 				onMouseLeave={toggleArrowHovered}
@@ -66,14 +70,15 @@ function TopArrowHandler({ classes, componentId, componentRef, toggleArrowHovere
 
 }
 
-TopArrowHandler.propTypes = {
+LeftArrowHandler.propTypes = {
 	classes: PropTypes.object.isRequired,
 	componentRef: PropTypes.object.isRequired,
 	toggleArrowHovered: PropTypes.func.isRequired,
 	toggleArrowDragging: PropTypes.func.isRequired,
 	offset: PropTypes.object.isRequired,
-	componentId: PropTypes.string.isRequired
+	componentId: PropTypes.string.isRequired,
+	parentSize: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(TopArrowHandler);
+export default withStyles(styles)(LeftArrowHandler);
 

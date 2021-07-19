@@ -10,14 +10,15 @@ const styles = () => ({
 		color: "rgb(52, 85, 235, 0.3)",
 		position: "absolute",
 		right: 0,
-		margin: "-15% -12px 0",
+		marginRight: "-16px",
+		marginTop: "42px",
 		"&:hover": {
 			color: "rgb(52, 85, 235, 0.8)"
 		}
 	}
 });
 
-function RightArrowHandler({ classes, componentId, componentRef, toggleArrowHovered, toggleArrowDragging, offset }) {
+function RightArrowHandler({ classes, componentId, componentRef, toggleArrowHovered, toggleArrowDragging, offset, parentSize }) {
 	const ref = React.createRef();
 	const [isBeingDragged, setIsBeingDragged] = React.useState(false);
 	const [position, setPosition] = React.useState({});
@@ -49,7 +50,10 @@ function RightArrowHandler({ classes, componentId, componentRef, toggleArrowHove
 		<React.Fragment>
 			<div
 				ref={ref}
-				style={{...position}}
+				style={{
+					...position,
+					marginTop: `${(parentSize.height-39)/2}px`
+				}}
 				className={classes.arrow}
 				onMouseEnter={toggleArrowHovered}
 				onMouseLeave={toggleArrowHovered}
@@ -72,7 +76,8 @@ RightArrowHandler.propTypes = {
 	toggleArrowHovered: PropTypes.func.isRequired,
 	toggleArrowDragging: PropTypes.func.isRequired,
 	offset: PropTypes.object.isRequired,
-	componentId: PropTypes.string.isRequired
+	componentId: PropTypes.string.isRequired,
+	parentSize: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(RightArrowHandler);
