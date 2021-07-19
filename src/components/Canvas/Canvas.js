@@ -6,8 +6,9 @@ import Container from "@material-ui/core/Container";
 import Xarrow from "react-xarrows";
 
 import { CanvasAsset } from "../CanvasAsset";
-import { Button, Drawer, Grid, TextField, AppBar, Tabs, Tab } from "@material-ui/core";
-import TabPanel from "@material-ui/lab/TabPanel";
+import { Button, Drawer, Grid, TextField, AppBar } from "@material-ui/core";
+import { Tabs, Tab, TabPanel, TabList } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
 
 const drawerWidth = 500;
 var prevAssetID = "asset-0";
@@ -28,7 +29,6 @@ const styles = () => ({
 	}, 
 	drawerStyle: {
 		width: drawerWidth,
-		padding: "2rem",
 	},
 	headingStyle: {
 		textAlign: "left",
@@ -50,7 +50,7 @@ export class Canvas extends React.Component {
 			arrows: [],
 			isArrowBeingDrawn: false,
 			menuOpen: false,
-			tabValue: 0,
+			tabValue: 0
 		};
 	}
 
@@ -145,27 +145,29 @@ export class Canvas extends React.Component {
 		prevAssetID = currAssetID;
 	};
 
-	changeTab = (newTab) => {
+	changeTab = (event, newTab) => {
+		console.log(newTab);
 		const { tabValue } = this.state;
 		this.setState({ tabValue: newTab });
 	}
-
+	// try work out how to use material-ui tabs, react tabs look crap
+	// but im sick of trying rn so this is a functional workaround
 	DrawerContents = () => (
-		
 		<div className={this.props.classes.drawerStyle}>
 			<h2 className={this.props.classes.headingStyle}>
 				{currAssetID}
 			</h2>
-			<AppBar position="static">
-				<Tabs value={this.state.tabValue} onChange={this.changeTab} aria-label="simple tabs example">
-					<Tab label="Package Checker"/>
-					<Tab label="Something else"/>
-					<Tab label="coming soon idk"/>
-				</Tabs>
-			</AppBar>
 
-			<TabPanel value={value} index={0}>
-				<Grid item xs={12}>
+			<Tabs value={this.state.tabValue} onChange={this.changeTab}>
+				<AppBar position="static">
+					<TabList>
+						<Tab>Tab 1</Tab>
+						<Tab>Tab 2</Tab>
+						<Tab>Tab 3</Tab>
+					</TabList>
+				</AppBar>
+				<TabPanel>
+					<Grid item xs={12}>
 					<TextField
 						fullWidth
 						variant="outlined"
@@ -174,22 +176,29 @@ export class Canvas extends React.Component {
 						rows={10}
 						rowsMax={10}
 					/>
-				</Grid>
-				<div className={this.props.classes.buttonStyle}>
-					<Button 
-						size="medium"
-						variant="contained"
-					>
-						{"check packages"}
-					</Button>
-				</div>
-			</TabPanel>
-			<TabPanel value={value} index={1}>
-			Item Two
-			</TabPanel>
-			<TabPanel value={value} index={2}>
-			Item Three
-			</TabPanel>
+					</Grid>
+					<div className={this.props.classes.buttonStyle}>
+						<Button 
+							size="medium"
+							variant="contained"
+						>
+							{"check packages"}
+						</Button>
+					</div>
+				</TabPanel>
+
+				<TabPanel>
+					hello
+				</TabPanel>
+
+				<TabPanel>
+					sfssfsfsf
+				</TabPanel>
+
+			</Tabs>
+
+
+			
 		</div>
 	);
 
@@ -243,12 +252,11 @@ export class Canvas extends React.Component {
 			
 		);
 	}
-
 }
 
 Canvas.propTypes = {
 	classes: PropTypes.object.isRequired,
-	children: PropTypes.array.isRequired
+	children: PropTypes.array.isRequired,
 };
 
 export default withStyles(styles)(Canvas);
