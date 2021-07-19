@@ -41,9 +41,6 @@ const styles = () => ({
 		alignItems: "center",
 		flexDirection: "column"
 	},
-	menuButton: {
-		position
-	}
 });
 
 const ICONS = {
