@@ -6,9 +6,8 @@ import Container from "@material-ui/core/Container";
 import Xarrow from "react-xarrows";
 
 import { CanvasAsset } from "../CanvasAsset";
-import { Button, Drawer, Grid, TextField } from "@material-ui/core";
-import { AppBar } from "@material-ui/core";
-import { Tabs } from "@material-ui/core";
+import { Button, Drawer, Grid, TextField, AppBar, Tabs, Tab } from "@material-ui/core";
+import TabPanel from "@material-ui/lab/TabPanel";
 
 const drawerWidth = 500;
 var prevAssetID = "asset-0";
@@ -50,7 +49,8 @@ export class Canvas extends React.Component {
 			assets: [],
 			arrows: [],
 			isArrowBeingDrawn: false,
-			menuOpen: false
+			menuOpen: false,
+			tabValue: 0,
 		};
 	}
 
@@ -120,10 +120,6 @@ export class Canvas extends React.Component {
 		return;
 	};
 
-	sleep = (milliseconds) => {
-        return new Promise(resolve => setTimeout(resolve, milliseconds))
-    }
-
 	setDrawerButton = (id) => {
 		const { menuOpen } = this.state;
 
@@ -137,10 +133,8 @@ export class Canvas extends React.Component {
 		prevID = prevAssetID.match(/\d/g);
 		prevID = parseInt(prevID.join(""));
 
-		//console.log(currID + " " + prevID);
-
 		if(currID != prevID && menuOpen == true) {
-			//flash refresh of drawer
+			//quick refresh of drawer to current asset
 			this.setDrawer(false);
 			this.setDrawer(true);
 		}
@@ -151,17 +145,44 @@ export class Canvas extends React.Component {
 		prevAssetID = currAssetID;
 	};
 
+	changeTab = (newTab) => {
+		const { tabValue } = this.state;
+		this.setState({ tabValue: newTab });
+	}
+
 	DrawerContents = () => (
+		
 		<div className={this.props.classes.drawerStyle}>
+			<h2 className={this.props.classes.headingStyle}>
+				{currAssetID}
+			</h2>
 			<AppBar position="static">
-			<Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-				<Tab label="Item One" {...a11yProps(0)} />
-				<Tab label="Item Two" {...a11yProps(1)} />
-				<Tab label="Item Three" {...a11yProps(2)} />
-			</Tabs>
+				<Tabs value={this.state.tabValue} onChange={this.changeTab} aria-label="simple tabs example">
+					<Tab label="Package Checker"/>
+					<Tab label="Something else"/>
+					<Tab label="coming soon idk"/>
+				</Tabs>
 			</AppBar>
+
 			<TabPanel value={value} index={0}>
-			Item One
+				<Grid item xs={12}>
+					<TextField
+						fullWidth
+						variant="outlined"
+						placeholder="Enter your package names"
+						multiline
+						rows={10}
+						rowsMax={10}
+					/>
+				</Grid>
+				<div className={this.props.classes.buttonStyle}>
+					<Button 
+						size="medium"
+						variant="contained"
+					>
+						{"check packages"}
+					</Button>
+				</div>
 			</TabPanel>
 			<TabPanel value={value} index={1}>
 			Item Two
@@ -169,28 +190,6 @@ export class Canvas extends React.Component {
 			<TabPanel value={value} index={2}>
 			Item Three
 			</TabPanel>
-			<h2 className={this.props.classes.headingStyle}>
-				{currAssetID}
-			</h2>
-			<Grid item xs={12}>
-				<TextField
-					fullWidth
-					variant="outlined"
-					placeholder="Enter your package names"
-					multiline
-					rows={10}
-					rowsMax={10}
-				/>
-			</Grid>
-			<p></p>
-			<div className={this.props.classes.buttonStyle}>
-				<Button 
-					size="medium"
-					variant="contained"
-				>
-					{"check packages"}
-				</Button>
-			</div>
 		</div>
 	);
 
