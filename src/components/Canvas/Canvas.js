@@ -52,13 +52,13 @@ export class Canvas extends React.Component {
 
 	onDrop = (e) => {
 		if (e.dataTransfer.getData("string") === "asset") {
-			this.addAsset(e.clientX - e.target.offsetLeft, e.clientY - e.target.offsetTop);
+			this.addAsset(e.clientX - e.target.offsetLeft, e.clientY - e.target.offsetTop, e.dataTransfer.getData("name"));
 			e.preventDefault();
 			e.stopPropagation();
 		}
 	};
 
-	addAsset = (x, y) => {
+	addAsset = (x, y, name) => {
 		const { assets } = this.state;
 		const assetId = assets.length > 0 
 			? parseInt(assets[assets.length-1].id.split("-").pop()) + 1 
@@ -66,7 +66,9 @@ export class Canvas extends React.Component {
 		const newAsset = {
 			id: `asset-${assetId}`,
 			x: x,
-			y: y
+			y: y,
+			type: name.toLowerCase(),
+			name: name
 		};
 
 		this.setState({ assets: [...this.state.assets, newAsset] });

@@ -4,9 +4,16 @@ import clsx from "clsx";
 
 import { withStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
 import { Rnd } from "react-rnd";
 
 import { TopArrowHandler, RightArrowHandler, BottomArrowHandler, LeftArrowHandler } from "../ArrowHandlers";
+
+import { ec2 } from "../../icons/resources/ec2";
+import { lambda } from "../../icons/resources/lambda";
+import { rds } from "../../icons/resources/rds";
+import { s3 } from "../../icons/resources/s3";
+import { vpc } from "../../icons/resources/vpc";
 
 const styles = () => ({
 	assetOverlay: {
@@ -24,9 +31,21 @@ const styles = () => ({
 		top: "50%",
 		left: "50%",
 		transform: "translate(-50%, -50%)",
-		position: "absolute"
+		position: "absolute",
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		flexDirection: "column"
 	}
 });
+
+const ICONS = {
+	ec2,
+	lambda,
+	rds,
+	s3,
+	vpc
+};
 
 export class CanvasAsset extends React.Component {
 
@@ -101,6 +120,8 @@ export class CanvasAsset extends React.Component {
 	render() {
 		const { classes, id, metadata, isArrowBeingDrawn, toggleArrowDrawn } = this.props;
 		const { hovered, arrowHovered, offset, size } = this.state;
+
+		const ResourceIcon = ICONS[metadata.type];
 
 		return (
 			<React.Fragment>
@@ -183,7 +204,10 @@ export class CanvasAsset extends React.Component {
 							onDragOver={this.onDragOver}
 							onDragLeave={this.onDragLeave}
 							onDrop={this.onDrop}
-						/>
+						>
+							<ResourceIcon />
+							<Typography>{metadata.name}</Typography>
+						</Paper>
 					</div>
 				</Rnd>
 			</React.Fragment>
