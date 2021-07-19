@@ -10,7 +10,7 @@ const styles = () => ({
 		color: "rgb(52, 85, 235, 0.3)",
 		position: "absolute",
 		top: 0,
-		marginTop: "-12px",
+		marginTop: "-16px",
 		marginLeft: "42px",
 		"&:hover": {
 			color: "rgb(52, 85, 235, 0.8)"

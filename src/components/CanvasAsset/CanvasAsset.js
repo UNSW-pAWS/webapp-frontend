@@ -153,7 +153,7 @@ export class CanvasAsset extends React.Component {
 						onMouseEnter={() => { this.setState({ hovered: true }); }} 
 						onMouseLeave={() => { this.setState({ hovered: false }); }}
 					>
-						{ (
+						{ hovered && (
 							<>
 								<TopArrowHandler
 									componentId={id}
