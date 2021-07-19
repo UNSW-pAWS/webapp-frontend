@@ -12,9 +12,6 @@ const styles = () => ({
 	assetOverlay: {
 		height: "100%",
 		width: "100%",
-		display: "flex",
-		justifyContent: "center",
-		alignItems: "center",
 		position: "relative"
 	},
 	assetBorderGlow: {
@@ -23,7 +20,11 @@ const styles = () => ({
 	},
 	asset: {
 		height: "80%",
-		width: "80%"
+		width: "80%",
+		top: "50%",
+		left: "50%",
+		transform: "translate(-50%, -50%)",
+		position: "absolute"
 	}
 });
 
@@ -46,6 +47,10 @@ export class CanvasAsset extends React.Component {
 			offset: {
 				left: this.props.metadata.x - 30,
 				top: this.props.metadata.y - 30
+			},
+			size: {
+				width: 120,
+				height: 120
 			}
 		};
 	}
@@ -56,6 +61,10 @@ export class CanvasAsset extends React.Component {
 			offset: {
 				left: position.x,
 				top: position.y
+			},
+			size: {
+				width: this.componentRef.current.offsetWidth,
+				height: this.componentRef.current.offsetHeight
 			}
 		});
 	};
@@ -91,7 +100,7 @@ export class CanvasAsset extends React.Component {
 
 	render() {
 		const { classes, id, metadata, isArrowBeingDrawn, toggleArrowDrawn } = this.props;
-		const { hovered, arrowHovered, offset } = this.state;
+		const { hovered, arrowHovered, offset, size } = this.state;
 
 		return (
 			<React.Fragment>
@@ -123,8 +132,8 @@ export class CanvasAsset extends React.Component {
 						onMouseEnter={() => { this.setState({ hovered: true }); }} 
 						onMouseLeave={() => { this.setState({ hovered: false }); }}
 					>
-						{ hovered && (
-							<div className={classes.arrowContainer}>
+						{ (
+							<>
 								<TopArrowHandler
 									componentId={id}
 									componentRef={this.componentRef}
@@ -133,6 +142,7 @@ export class CanvasAsset extends React.Component {
 									}}
 									toggleArrowDragging={toggleArrowDrawn}
 									offset={offset}
+									parentSize={size}
 								/>
 								<RightArrowHandler
 									componentId={id}
@@ -142,6 +152,7 @@ export class CanvasAsset extends React.Component {
 									}}
 									toggleArrowDragging={toggleArrowDrawn}
 									offset={offset}
+									parentSize={size}
 								/>
 								<BottomArrowHandler
 									componentId={id}
@@ -151,6 +162,7 @@ export class CanvasAsset extends React.Component {
 									}}
 									toggleArrowDragging={toggleArrowDrawn}
 									offset={offset}
+									parentSize={size}
 								/>
 								<LeftArrowHandler
 									componentId={id}
@@ -160,8 +172,9 @@ export class CanvasAsset extends React.Component {
 									}}
 									toggleArrowDragging={toggleArrowDrawn}
 									offset={offset}
+									parentSize={size}
 								/>
-							</div>
+							</>
 						)}
 						<Paper
 							id={id}

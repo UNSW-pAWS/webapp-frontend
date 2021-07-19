@@ -7,7 +7,7 @@ Frontend application which allows users to enter their dependencies and view the
 ## Developer Guide
 
 ### How to run:
-1. Change into the correct directory - ```cd ./src```
+1. Change into the correct directory - ```cd ./```
 2. Ensure that there isn't an existing node_modules by running ```rm -rf node_modules```
 3. Install the required node modules - ```npm install```
 4. Start the app - ```npm start```
