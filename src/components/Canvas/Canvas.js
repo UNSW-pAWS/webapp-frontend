@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import _ from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -32,7 +33,8 @@ export class Canvas extends React.Component {
 			mouseOver: false,
 			assets: [],
 			arrows: [],
-			isArrowBeingDrawn: false
+			isArrowBeingDrawn: false,
+			selectedItem: ""
 		};
 	}
 
@@ -61,6 +63,7 @@ export class Canvas extends React.Component {
 
 	addAsset = (x, y, name) => {
 		const { assets } = this.state;
+
 		const assetId = assets.length > 0 
 			? parseInt(assets[assets.length-1].id.split("-").pop()) + 1 
 			: 0;
@@ -73,6 +76,15 @@ export class Canvas extends React.Component {
 		};
 
 		this.setState({ assets: [...this.state.assets, newAsset] });
+	};
+
+	deleteAsset = (id) => {
+		const assetsClone = _.cloneDeep(this.state.assets);
+
+		this.setState({
+			assets: assetsClone.filter(a => a.id !== id),
+			selectedItem: ""
+		})
 	};
 
 	addArrow = (startRef, endRef) => {
@@ -97,9 +109,13 @@ export class Canvas extends React.Component {
 		}));
 	}
 
+	setSelectedItem = (id, callback) => {
+		this.setState({ selectedItem: id }, callback());
+	}
+
 	render() {
 		const { classes } = this.props;
-		const { assets, arrows, isArrowBeingDrawn, isAssetBeingDragged } = this.state;
+		const { assets, arrows, isArrowBeingDrawn, selectedItem, isAssetBeingDragged } = this.state;
 
 		return (
 			<Container
@@ -118,9 +134,12 @@ export class Canvas extends React.Component {
 									id={a.id}
 									metadata={a}
 									isArrowBeingDrawn={isArrowBeingDrawn}
+									selectedItem={selectedItem}
+									setSelectedItem={this.setSelectedItem}
 									toggleArrowDrawn={() => {
 										this.setState({ isArrowBeingDrawn: !isArrowBeingDrawn });
 									}}
+									deleteAsset={this.deleteAsset}
 									addArrow={this.addArrow}
 									deleteArrow={this.deleteArrow}
 									toggleAssetBeingDragged={() => {
@@ -133,9 +152,12 @@ export class Canvas extends React.Component {
 									id={a.id}
 									metadata={a}
 									isArrowBeingDrawn={isArrowBeingDrawn}
+									selectedItem={selectedItem}
+									setSelectedItem={this.setSelectedItem}
 									toggleArrowDrawn={() => {
 										this.setState({ isArrowBeingDrawn: !isArrowBeingDrawn });
 									}}
+									deleteAsset={this.deleteAsset}
 									addArrow={this.addArrow}
 									deleteArrow={this.deleteArrow}
 									toggleAssetBeingDragged={() => {
@@ -146,7 +168,15 @@ export class Canvas extends React.Component {
 					);
 				}) }
 				{ arrows.map((a) => {
-					return <Xarrow key={a.id} id={a.id} start={a.startRef} end={a.endRef} />;
+					return (
+						<Xarrow
+							key={a.id}
+							id={a.id}
+							start={a.startRef}
+							end={a.endRef}
+							onClick={() => console.log("arrowClicked!")}
+						/>
+					)
 				}) }
 			</Container>
 		);

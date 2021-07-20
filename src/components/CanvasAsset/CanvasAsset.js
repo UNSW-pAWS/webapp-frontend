@@ -25,6 +25,10 @@ const styles = () => ({
 		border: "1px solid #4195FC",
 		boxShadow: "0px 0px 5px #4195FC"
 	},
+	assetSelectedGlow: {
+		border: "1px solid #32a852",
+		boxShadow: "0px 0px 5px #32a852"
+	},
 	asset: {
 		height: "80%",
 		width: "80%",
@@ -55,6 +59,7 @@ export class CanvasAsset extends React.Component {
 		this.componentRef = React.createRef();
 
 		this.state = {
+			selected: false,
 			hovered: false,
 			arrowClicked: false,
 			arrowPositions: {
@@ -72,6 +77,22 @@ export class CanvasAsset extends React.Component {
 				height: 120
 			}
 		};
+	}
+
+	componentDidMount() {
+		window.addEventListener("keydown", this.handleKeyDown)
+	}
+
+	handleKeyDown = (e) => {
+		if (e.key === "Escape" && this.state.selected) {
+			this.props.setSelectedItem("", () => {
+				this.setState({ selected: false });
+			})
+		} else if ((e.key === "Delete" || e.key === "Backspace") && this.state.selected) {
+			this.setState({ selected: false }, () => {
+				this.props.deleteAsset(this.props.id);
+			});
+		}
 	}
 
 	onResize = (e, dir, refToElement, delta, position) => {
@@ -117,8 +138,16 @@ export class CanvasAsset extends React.Component {
 		e.stopPropagation();
 	};
 
+	handleSelect = () => {
+		const { id, setSelectedItem } = this.props;
+
+		setSelectedItem(id, () => {
+			this.setState({ selected: true });
+		});
+	}
+
 	render() {
-		const { classes, id, metadata, isArrowBeingDrawn, toggleArrowDrawn } = this.props;
+		const { classes, id, metadata, isArrowBeingDrawn, selectedItem, toggleArrowDrawn } = this.props;
 		const { hovered, arrowHovered, offset, size } = this.state;
 
 		const ResourceIcon = ICONS[metadata.type];
@@ -146,6 +175,7 @@ export class CanvasAsset extends React.Component {
 					}}
 					onDrag={this.onDrag}
 					onResize={this.onResize}
+					onClick={this.handleSelect}
 				>
 					<div
 						ref={this.componentRef}
@@ -199,7 +229,7 @@ export class CanvasAsset extends React.Component {
 						)}
 						<Paper
 							id={id}
-							className={clsx(classes.asset, isArrowBeingDrawn && classes.assetBorderGlow)}
+							className={clsx(classes.asset, isArrowBeingDrawn && classes.assetBorderGlow, selectedItem === id && classes.assetSelectedGlow)}
 							onDragEnter={this.onDragEnter}
 							onDragOver={this.onDragOver}
 							onDragLeave={this.onDragLeave}
@@ -221,7 +251,10 @@ CanvasAsset.propTypes = {
 	id: PropTypes.string.isRequired,
 	metadata: PropTypes.object.isRequired,
 	toggleArrowDrawn: PropTypes.func.isRequired,
+	selectedItem: PropTypes.string.isRequired,
+	setSelectedItem: PropTypes.func.isRequired,
 	isArrowBeingDrawn: PropTypes.bool.isRequired,
+	deleteAsset: PropTypes.func.isRequired,
 	addArrow: PropTypes.func.isRequired,
 	deleteArrow: PropTypes.func.isRequired,
 	toggleAssetBeingDragged: PropTypes.func.isRequired
