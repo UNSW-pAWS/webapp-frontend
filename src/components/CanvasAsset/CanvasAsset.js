@@ -25,9 +25,8 @@ const styles = () => ({
 		border: "1px solid #4195FC",
 		boxShadow: "0px 0px 5px #4195FC"
 	},
-	assetSelectedGlow: {
-		border: "1px solid #32a852",
-		boxShadow: "0px 0px 5px #32a852"
+	assetSelected: {
+		border: "2px solid #32a852"
 	},
 	asset: {
 		height: "80%",
@@ -59,7 +58,6 @@ export class CanvasAsset extends React.Component {
 		this.componentRef = React.createRef();
 
 		this.state = {
-			selected: false,
 			hovered: false,
 			arrowClicked: false,
 			arrowPositions: {
@@ -84,14 +82,12 @@ export class CanvasAsset extends React.Component {
 	}
 
 	handleKeyDown = (e) => {
-		if (e.key === "Escape" && this.state.selected) {
-			this.props.setSelectedItem("", () => {
-				this.setState({ selected: false });
-			})
-		} else if ((e.key === "Delete" || e.key === "Backspace") && this.state.selected) {
-			this.setState({ selected: false }, () => {
-				this.props.deleteAsset(this.props.id);
-			});
+		const { selectedItem, setSelectedItem, deleteAsset, id } = this.props;
+
+		if (e.key === "Escape" && (selectedItem === id)) {
+			setSelectedItem("");
+		} else if ((e.key === "Delete" || e.key === "Backspace") && (selectedItem === id)) {
+			deleteAsset(id);
 		}
 	}
 
@@ -133,7 +129,10 @@ export class CanvasAsset extends React.Component {
 	};
 
 	onDrop = (e) => {
-		this.props.addArrow(e.dataTransfer.getData("parent"), this.componentRef);
+		const { id, addArrow, toggleArrowDrawn } = this.props;
+
+		addArrow(e.dataTransfer.getData("parent"), this.componentRef, id);
+		toggleArrowDrawn(false);
 		e.preventDefault();
 		e.stopPropagation();
 	};
@@ -141,10 +140,8 @@ export class CanvasAsset extends React.Component {
 	handleSelect = () => {
 		const { id, setSelectedItem } = this.props;
 
-		setSelectedItem(id, () => {
-			this.setState({ selected: true });
-		});
-	}
+		setSelectedItem(id);
+	};
 
 	render() {
 		const { classes, id, metadata, isArrowBeingDrawn, selectedItem, toggleArrowDrawn } = this.props;
@@ -229,7 +226,7 @@ export class CanvasAsset extends React.Component {
 						)}
 						<Paper
 							id={id}
-							className={clsx(classes.asset, isArrowBeingDrawn && classes.assetBorderGlow, selectedItem === id && classes.assetSelectedGlow)}
+							className={clsx(classes.asset, isArrowBeingDrawn && classes.assetBorderGlow, selectedItem === id && classes.assetSelected)}
 							onDragEnter={this.onDragEnter}
 							onDragOver={this.onDragOver}
 							onDragLeave={this.onDragLeave}
@@ -256,7 +253,6 @@ CanvasAsset.propTypes = {
 	isArrowBeingDrawn: PropTypes.bool.isRequired,
 	deleteAsset: PropTypes.func.isRequired,
 	addArrow: PropTypes.func.isRequired,
-	deleteArrow: PropTypes.func.isRequired,
 	toggleAssetBeingDragged: PropTypes.func.isRequired
 };
 

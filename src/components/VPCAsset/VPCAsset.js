@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import clsx from "clsx";
 
 import { withStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -13,7 +14,8 @@ const styles = () => ({
 		height: "100%",
 		width: "100%",
 		border: "2px solid #4D4D4D",
-		borderRadius: "4px"
+		borderRadius: "4px",
+		boxSizing: "border-box"
 	},
 	asset: {
 		height: "70px",
@@ -23,7 +25,11 @@ const styles = () => ({
 		display: "flex",
 		justifyContent: "center",
 		alignItems: "center",
-		flexDirection: "column"
+		flexDirection: "column",
+		boxSizing: "border-box"
+	},
+	assetSelected: {
+		border: "2px solid #32a852"
 	}
 });
 
@@ -41,6 +47,20 @@ export class CanvasAsset extends React.Component {
 			},
 		};
 	}
+
+	componentDidMount() {
+		window.addEventListener("keydown", this.handleKeyDown)
+	};
+
+	handleKeyDown = (e) => {
+		const { selectedItem, setSelectedItem, deleteAsset, id } = this.props;
+
+		if (e.key === "Escape" && (selectedItem === id)) {
+			setSelectedItem("");
+		} else if ((e.key === "Delete" || e.key === "Backspace") && (selectedItem === id)) {
+			deleteAsset(id);
+		}
+	};
 
 	onResize = (e, dir, refToElement, delta, position) => {
 		this.props.toggleAssetBeingDragged();
@@ -62,8 +82,14 @@ export class CanvasAsset extends React.Component {
 		});
 	};
 
+	handleSelect = () => {
+		const { id, setSelectedItem } = this.props;
+
+		setSelectedItem(id);
+	};
+
 	render() {
-		const { classes, id, metadata } = this.props;
+		const { classes, id, metadata, selectedItem } = this.props;
 
 		const ResourceIcon = vpc;
 
@@ -91,11 +117,12 @@ export class CanvasAsset extends React.Component {
 					onResize={this.onResize}
 				>
 					<div
-						className={classes.vpcBorder}
+						className={clsx(classes.vpcBorder, selectedItem === id && classes.assetSelected)}
 					/>
 					<Paper
 						id={id}
-						className={classes.asset}
+						className={clsx(classes.asset, selectedItem === id && classes.assetSelected)}
+						onClick={this.handleSelect}
 					>
 						<ResourceIcon />
 						<Typography>{metadata.name}</Typography>
@@ -110,7 +137,11 @@ export class CanvasAsset extends React.Component {
 CanvasAsset.propTypes = {
 	classes: PropTypes.object.isRequired,
 	id: PropTypes.string.isRequired,
-	metadata: PropTypes.object.isRequired
+	metadata: PropTypes.object.isRequired,
+	selectedItem: PropTypes.string.isRequired,
+	setSelectedItem: PropTypes.func.isRequired,
+	deleteAsset: PropTypes.func.isRequired,
+	toggleAssetBeingDragged: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(CanvasAsset);
