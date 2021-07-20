@@ -118,7 +118,6 @@ export class Canvas extends React.Component {
 	}
 
 	setSelectedItem = (id) => {
-		console.log(id)
 		this.setState({ selectedItem: id });
 	}
 
@@ -180,7 +179,7 @@ export class Canvas extends React.Component {
 							setSelectedItem={this.setSelectedItem}
 							deleteArrow={this.deleteArrow}
 						/>
-					)
+					);
 				}) }
 			</Container>
 		);

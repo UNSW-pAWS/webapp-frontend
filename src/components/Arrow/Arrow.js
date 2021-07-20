@@ -12,7 +12,7 @@ export class Arrow extends React.Component {
 	}
 
 	componentDidMount() {
-		window.addEventListener("keydown", this.handleKeyDown)
+		window.addEventListener("keydown", this.handleKeyDown);
 	}
 
 	handleKeyDown = (e) => {

@@ -19,7 +19,8 @@ const styles = () => ({
 	assetOverlay: {
 		height: "100%",
 		width: "100%",
-		position: "relative"
+		position: "relative",
+		zIndex: 10
 	},
 	assetBorderGlow: {
 		border: "1px solid #4195FC",
@@ -78,7 +79,7 @@ export class CanvasAsset extends React.Component {
 	}
 
 	componentDidMount() {
-		window.addEventListener("keydown", this.handleKeyDown)
+		window.addEventListener("keydown", this.handleKeyDown);
 	}
 
 	handleKeyDown = (e) => {

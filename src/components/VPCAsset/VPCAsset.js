@@ -49,8 +49,8 @@ export class CanvasAsset extends React.Component {
 	}
 
 	componentDidMount() {
-		window.addEventListener("keydown", this.handleKeyDown)
-	};
+		window.addEventListener("keydown", this.handleKeyDown);
+	}
 
 	handleKeyDown = (e) => {
 		const { selectedItem, setSelectedItem, deleteAsset, id } = this.props;

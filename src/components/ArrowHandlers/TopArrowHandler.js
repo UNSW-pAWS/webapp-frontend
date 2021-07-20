@@ -5,8 +5,6 @@ import Xarrow from "react-xarrows";
 import { withStyles } from "@material-ui/core/styles";
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
 
-import { Arrow } from "../Arrow";
-
 const styles = () => ({
 	arrow: {
 		color: "rgb(52, 85, 235, 0.3)",
