@@ -6,6 +6,7 @@ import Container from "@material-ui/core/Container";
 import Xarrow from "react-xarrows";
 
 import { CanvasAsset } from "../CanvasAsset";
+import { VPCAsset } from "../VPCAsset";
 
 const styles = () => ({
 	base: {
@@ -110,20 +111,38 @@ export class Canvas extends React.Component {
 			>
 				{ assets.map((a) => {
 					return (
-						<CanvasAsset
-							key={a.id}
-							id={a.id}
-							metadata={a}
-							isArrowBeingDrawn={isArrowBeingDrawn}
-							toggleArrowDrawn={() => {
-								this.setState({ isArrowBeingDrawn: !isArrowBeingDrawn });
-							}}
-							addArrow={this.addArrow}
-							deleteArrow={this.deleteArrow}
-							toggleAssetBeingDragged={() => {
-								this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
-							}}
-						/>
+						a.type === "vpc"
+							? (
+								<VPCAsset
+									key={a.id}
+									id={a.id}
+									metadata={a}
+									isArrowBeingDrawn={isArrowBeingDrawn}
+									toggleArrowDrawn={() => {
+										this.setState({ isArrowBeingDrawn: !isArrowBeingDrawn });
+									}}
+									addArrow={this.addArrow}
+									deleteArrow={this.deleteArrow}
+									toggleAssetBeingDragged={() => {
+										this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
+									}}
+								/>
+							) : (
+								<CanvasAsset
+									key={a.id}
+									id={a.id}
+									metadata={a}
+									isArrowBeingDrawn={isArrowBeingDrawn}
+									toggleArrowDrawn={() => {
+										this.setState({ isArrowBeingDrawn: !isArrowBeingDrawn });
+									}}
+									addArrow={this.addArrow}
+									deleteArrow={this.deleteArrow}
+									toggleAssetBeingDragged={() => {
+										this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
+									}}
+								/>
+							)
 					);
 				}) }
 				{ arrows.map((a) => {
