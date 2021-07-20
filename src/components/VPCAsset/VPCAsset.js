@@ -62,19 +62,6 @@ export class CanvasAsset extends React.Component {
 		});
 	};
 
-	onDragEnter = (e) => {
-		e.preventDefault();
-	};
-
-	onDragOver = (e) => {
-		e.preventDefault();
-	};
-
-	onDragLeave = (e) => {
-		e.preventDefault();
-		e.stopPropagation();
-	};
-
 	render() {
 		const { classes, id, metadata } = this.props;
 
@@ -123,12 +110,7 @@ export class CanvasAsset extends React.Component {
 CanvasAsset.propTypes = {
 	classes: PropTypes.object.isRequired,
 	id: PropTypes.string.isRequired,
-	metadata: PropTypes.object.isRequired,
-	toggleArrowDrawn: PropTypes.func.isRequired,
-	isArrowBeingDrawn: PropTypes.bool.isRequired,
-	addArrow: PropTypes.func.isRequired,
-	deleteArrow: PropTypes.func.isRequired,
-	toggleAssetBeingDragged: PropTypes.func.isRequired
+	metadata: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(CanvasAsset);
