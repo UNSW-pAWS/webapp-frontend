@@ -6,9 +6,7 @@ import Container from "@material-ui/core/Container";
 import Xarrow from "react-xarrows";
 
 import { CanvasAsset } from "../CanvasAsset";
-import { Button, Drawer, Grid, TextField, AppBar } from "@material-ui/core";
-import { Tabs, Tab, TabPanel, TabList } from "react-tabs";
-import "react-tabs/style/react-tabs.css";
+import { Button, Drawer, Grid, TextField, AppBar, Tabs, Tab, Box, Typography } from "@material-ui/core";
 
 const drawerWidth = 600;
 var prevAssetID = "asset-0";
@@ -39,6 +37,26 @@ const styles = () => ({
 	}
 
 });
+
+function TabPanel(props) {
+	const { children, value, index, ...other } = props;
+  
+	return (
+		<div
+			role="tabpanel"
+			hidden={value !== index}
+			id={`simple-tabpanel-${index}`}
+			aria-labelledby={`simple-tab-${index}`}
+			{...other}
+		>
+			{value === index && (
+			<Box p={3}>
+				<Typography>{children}</Typography>
+			</Box>
+			)}
+		</div>
+	);	
+}
 
 export class Canvas extends React.Component {
 
@@ -153,57 +171,76 @@ export class Canvas extends React.Component {
 		const { tabValue } = this.state;
 		this.setState({ tabValue: newTab });
 	}
+
+	handleChange = (event, index) => {
+		console.log(index);
+		const { tabValue } = this.state;
+		this.setState({tabValue: index});
+	}
+	
+
 	// try work out how to use material-ui tabs, react tabs look crap
 	// but im sick of trying rn so this is a functional workaround
-	DrawerContents = () => (
-		<div className={this.props.classes.drawerStyle}>
-			<h2 className={this.props.classes.headingStyle}>
-				{currAssetID}
-			</h2>
+	DrawerContents = () => {
+		const { classes } = this.props;
+		const { tabValue } = this.state;
+		return (
+			<div className={classes.drawerStyle}>
+				<h2 className={classes.headingStyle}>
+					{currAssetID}
+				</h2>
 
-			<Tabs value={this.state.tabValue} onChange={this.changeTab}>
 				<AppBar position="static">
-					<TabList>
-						<Tab>Package Vulnerability</Tab>
-						<Tab>Configurations</Tab>
-						<Tab>idk</Tab>
-					</TabList>
+					<Tabs value={tabValue} onChange={() => this.handleChange} aria-label="simple tabs example">
+					<Tab label="Item One"/>
+					<Tab label="Item Two"/>
+					<Tab label="Item Three"/>
+					</Tabs>
 				</AppBar>
-				<TabPanel>
-					<Grid item xs={12}>
-					<TextField
-						fullWidth
-						variant="outlined"
-						placeholder="Enter your package names"
-						multiline
-						rows={10}
-						rowsMax={10}
-					/>
-					</Grid>
-					<div className={this.props.classes.buttonStyle}>
-						<Button 
-							size="medium"
-							variant="contained"
-						>
-							{"check packages"}
-						</Button>
-					</div>
+				<TabPanel value={tabValue} index={0}>
+					Item One
 				</TabPanel>
 
-				<TabPanel>
-					hello
-				</TabPanel>
+				{/* <Tabs value={tabValue} onChange={this.changeTab}>
+					<AppBar position="static">
+						<TabList>
+							<Tab>Package Vulnerability</Tab>
+							<Tab>Configurations</Tab>
+							<Tab>idk</Tab>
+						</TabList>
+					</AppBar>
+					<TabPanel>
+						<Grid item xs={12}>
+						<TextField
+							fullWidth
+							variant="outlined"
+							placeholder="Enter your package names"
+							multiline
+							rows={10}
+							rowsMax={10}
+						/>
+						</Grid>
+						<div className={classes.buttonStyle}>
+							<Button 
+								size="medium"
+								variant="contained"
+							>
+								{"check packages"}
+							</Button>
+						</div>
+					</TabPanel>
 
-				<TabPanel>
-					sfssfsfsf
-				</TabPanel>
+					<TabPanel>
+						hello
+					</TabPanel>
 
-			</Tabs>
-
-
-			
-		</div>
-	);
+					<TabPanel>
+						sfssfsfsf
+					</TabPanel>
+				</Tabs>	 */}
+			</div>
+		);
+	};
 
 	render() {
 		const { classes } = this.props;
