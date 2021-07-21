@@ -81,9 +81,11 @@ export class Canvas extends React.Component {
 	deleteAsset = (id) => {
 		if (id === this.state.selectedItem) {
 			const assetsClone = _.cloneDeep(this.state.assets);
+			const arrowsClone = _.cloneDeep(this.state.arrows);
 
 			this.setState({
 				assets: assetsClone.filter(a => a.id !== id),
+				arrows: arrowsClone.filter(a => a.startRef !== id && a.endId !== id),
 				selectedItem: null
 			});
 		}
