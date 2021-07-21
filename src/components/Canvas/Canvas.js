@@ -10,7 +10,7 @@ import { Button, Drawer, Grid, TextField, AppBar } from "@material-ui/core";
 import { Tabs, Tab, TabPanel, TabList } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 
-const drawerWidth = 500;
+const drawerWidth = 600;
 var prevAssetID = "asset-0";
 var currAssetID;
 
@@ -29,6 +29,7 @@ const styles = () => ({
 	}, 
 	drawerStyle: {
 		width: drawerWidth,
+		padding: "1rem"
 	},
 	headingStyle: {
 		textAlign: "left",
@@ -163,9 +164,9 @@ export class Canvas extends React.Component {
 			<Tabs value={this.state.tabValue} onChange={this.changeTab}>
 				<AppBar position="static">
 					<TabList>
-						<Tab>Tab 1</Tab>
-						<Tab>Tab 2</Tab>
-						<Tab>Tab 3</Tab>
+						<Tab>Package Vulnerability</Tab>
+						<Tab>Configurations</Tab>
+						<Tab>idk</Tab>
 					</TabList>
 				</AppBar>
 				<TabPanel>
