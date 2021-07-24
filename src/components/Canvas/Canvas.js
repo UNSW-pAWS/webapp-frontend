@@ -29,6 +29,8 @@ export class Canvas extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.canvasRef = React.createRef();
+
 		this.state = {
 			mouseOver: false,
 			assets: [],
@@ -54,8 +56,11 @@ export class Canvas extends React.Component {
 	};
 
 	onDrop = (e) => {
-		if (e.dataTransfer.getData("string") === "asset") {
-			this.addAsset(e.clientX - e.target.offsetLeft, e.clientY - e.target.offsetTop, e.dataTransfer.getData("name"));
+		const offsetLeft = this.canvasRef.current ? this.canvasRef.current.offsetLeft : 0;
+		const offsetTop = this.canvasRef.current ? this.canvasRef.current.offsetTop : 0;
+
+		if (e.dataTransfer.getData("type") === "asset") {
+			this.addAsset(e.clientX - offsetLeft, e.clientY - offsetTop, e.dataTransfer.getData("name"));
 			e.preventDefault();
 			e.stopPropagation();
 		}
@@ -63,7 +68,7 @@ export class Canvas extends React.Component {
 
 	addAsset = (x, y, name) => {
 		const { assets } = this.state;
-
+		
 		const assetId = assets.length > 0 
 			? parseInt(assets[assets.length-1].id.split("-").pop()) + 1 
 			: 0;
@@ -75,7 +80,7 @@ export class Canvas extends React.Component {
 			name: name
 		};
 
-		this.setState({ assets: [...this.state.assets, newAsset] });
+		this.setState({ assets: name.toLowerCase() === "vpc" ? [newAsset, ...assets] : [...assets, newAsset] });
 	};
 
 	deleteAsset = (id) => {
@@ -129,6 +134,7 @@ export class Canvas extends React.Component {
 
 		return (
 			<Container
+				ref={this.canvasRef}
 				className={classes.base}
 				onDragEnter={this.onDragEnter}
 				onDragOver={this.onDragOver}

@@ -132,9 +132,11 @@ export class CanvasAsset extends React.Component {
 	onDrop = (e) => {
 		const { id, addArrow, toggleArrowDrawn } = this.props;
 
-		addArrow(e.dataTransfer.getData("parent"), this.componentRef, id);
-		toggleArrowDrawn(false);
-		e.preventDefault();
+		if (e.dataTransfer.getData("type") === "arrow") {
+			addArrow(e.dataTransfer.getData("parent"), this.componentRef, id);
+			toggleArrowDrawn(false);
+			e.preventDefault();
+		}
 		e.stopPropagation();
 	};
 
@@ -249,12 +251,16 @@ CanvasAsset.propTypes = {
 	id: PropTypes.string.isRequired,
 	metadata: PropTypes.object.isRequired,
 	toggleArrowDrawn: PropTypes.func.isRequired,
-	selectedItem: PropTypes.string.isRequired,
+	selectedItem: PropTypes.string,
 	setSelectedItem: PropTypes.func.isRequired,
 	isArrowBeingDrawn: PropTypes.bool.isRequired,
 	deleteAsset: PropTypes.func.isRequired,
 	addArrow: PropTypes.func.isRequired,
 	toggleAssetBeingDragged: PropTypes.func.isRequired
+};
+
+CanvasAsset.defaultProps = {
+	selectedItem: null
 };
 
 export default withStyles(styles)(CanvasAsset);

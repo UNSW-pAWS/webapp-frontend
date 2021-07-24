@@ -33,7 +33,7 @@ const styles = () => ({
 	}
 });
 
-export class CanvasAsset extends React.Component {
+export class VPCAsset extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -134,14 +134,18 @@ export class CanvasAsset extends React.Component {
 
 }
 
-CanvasAsset.propTypes = {
+VPCAsset.propTypes = {
 	classes: PropTypes.object.isRequired,
 	id: PropTypes.string.isRequired,
 	metadata: PropTypes.object.isRequired,
-	selectedItem: PropTypes.string.isRequired,
+	selectedItem: PropTypes.string,
 	setSelectedItem: PropTypes.func.isRequired,
 	deleteAsset: PropTypes.func.isRequired,
 	toggleAssetBeingDragged: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(CanvasAsset);
+VPCAsset.defaultProps = {
+	selectedItem: null
+};
+
+export default withStyles(styles)(VPCAsset);

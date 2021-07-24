@@ -24,6 +24,7 @@ function BottomArrowHandler({ classes, componentId, componentRef, toggleArrowHov
 	const [position, setPosition] = React.useState({});
 
 	const onDragStart = (e) => {
+		e.dataTransfer.setData("type", "arrow");
 		e.dataTransfer.setData("parent", componentId);
 		toggleArrowDragging(true);
 		setIsBeingDragged(true);
