@@ -1,11 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
+import _ from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Xarrow from "react-xarrows";
 
+import { Arrow } from "../Arrow";
 import { CanvasAsset } from "../CanvasAsset";
+import { VPCAsset } from "../VPCAsset";
 
 const styles = () => ({
 	base: {
@@ -27,11 +29,16 @@ export class Canvas extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.canvasRef = React.createRef();
+
 		this.state = {
 			mouseOver: false,
 			assets: [],
 			arrows: [],
-			isArrowBeingDrawn: false
+			isArrowBeingDrawn: false,
+			selectedItem: null,
+			assetNextId: 0,
+			arrowNextId: 0
 		};
 	}
 
@@ -51,57 +58,85 @@ export class Canvas extends React.Component {
 	};
 
 	onDrop = (e) => {
-		if (e.dataTransfer.getData("string") === "asset") {
-			this.addAsset(e.clientX - e.target.offsetLeft, e.clientY - e.target.offsetTop, e.dataTransfer.getData("name"));
+		const offsetLeft = this.canvasRef.current ? this.canvasRef.current.offsetLeft : 0;
+		const offsetTop = this.canvasRef.current ? this.canvasRef.current.offsetTop : 0;
+
+		if (e.dataTransfer.getData("type") === "asset") {
+			this.addAsset(e.clientX - offsetLeft, e.clientY - offsetTop, e.dataTransfer.getData("name"));
 			e.preventDefault();
 			e.stopPropagation();
 		}
 	};
 
 	addAsset = (x, y, name) => {
-		const { assets } = this.state;
-		const assetId = assets.length > 0 
-			? parseInt(assets[assets.length-1].id.split("-").pop()) + 1 
-			: 0;
+		const { assets, assetNextId } = this.state;
+		
 		const newAsset = {
-			id: `asset-${assetId}`,
+			id: `asset-${assetNextId}`,
 			x: x,
 			y: y,
 			type: name.toLowerCase(),
 			name: name
 		};
 
-		this.setState({ assets: [...this.state.assets, newAsset] });
+		this.setState({
+			assets: name.toLowerCase() === "vpc" ? [newAsset, ...assets] : [...assets, newAsset],
+			assetNextId: assetNextId + 1
+		});
 	};
 
-	addArrow = (startRef, endRef) => {
-		const { arrows } = this.state;
+	deleteAsset = (id) => {
+		if (id === this.state.selectedItem) {
+			const assetsClone = _.cloneDeep(this.state.assets);
+			const arrowsClone = _.cloneDeep(this.state.arrows);
 
-		const arrowId = arrows.length > 0 
-			? parseInt(arrows[arrows.length-1].id.split("-").pop()) + 1 
-			: 0;
+			this.setState({
+				assets: assetsClone.filter(a => a.id !== id),
+				arrows: arrowsClone.filter(a => a.startRef !== id && a.endId !== id),
+				selectedItem: null
+			});
+		}
+	};
+
+	addArrow = (startRef, endRef, endId) => {
+		const { arrows, arrowNextId } = this.state;
+
 		const newArrow = {
-			id: `arrow-${arrowId}`,
+			id: `arrow-${arrowNextId}`,
 			startRef: startRef,
-			endRef: endRef
+			endRef: endRef,
+			endId: endId
 		};
 
-		this.setState({ arrows: [...arrows, newArrow] });
-		return `arrow-${arrowId}`;
+		this.setState({
+			arrows: [...arrows, newArrow],
+			arrowNextId: arrowNextId + 1
+		});
+		return `arrow-${newArrow.id}`;
 	}
 
 	deleteArrow = (id) => {
-		this.setState((prevState) => ({
-			arrows: prevState.arrows.filter(a => a.id !== id)
-		}));
+		if (id === this.state.selectedItem) {
+			const arrowsClone = _.cloneDeep(this.state.arrows);
+
+			this.setState({
+				arrows: arrowsClone.filter(a => a.id !== id),
+				selectedItem: null
+			});
+		}
+	}
+
+	setSelectedItem = (id) => {
+		this.setState({ selectedItem: id });
 	}
 
 	render() {
 		const { classes } = this.props;
-		const { assets, arrows, isArrowBeingDrawn, isAssetBeingDragged } = this.state;
+		const { assets, arrows, isArrowBeingDrawn, selectedItem, isAssetBeingDragged } = this.state;
 
 		return (
 			<Container
+				ref={this.canvasRef}
 				className={classes.base}
 				onDragEnter={this.onDragEnter}
 				onDragOver={this.onDragOver}
@@ -110,24 +145,51 @@ export class Canvas extends React.Component {
 			>
 				{ assets.map((a) => {
 					return (
-						<CanvasAsset
-							key={a.id}
-							id={a.id}
-							metadata={a}
-							isArrowBeingDrawn={isArrowBeingDrawn}
-							toggleArrowDrawn={() => {
-								this.setState({ isArrowBeingDrawn: !isArrowBeingDrawn });
-							}}
-							addArrow={this.addArrow}
-							deleteArrow={this.deleteArrow}
-							toggleAssetBeingDragged={() => {
-								this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
-							}}
-						/>
+						a.type === "vpc"
+							? (
+								<VPCAsset
+									key={a.id}
+									id={a.id}
+									metadata={a}
+									selectedItem={selectedItem}
+									setSelectedItem={this.setSelectedItem}
+									deleteAsset={this.deleteAsset}
+									toggleAssetBeingDragged={() => {
+										this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
+									}}
+								/>
+							) : (
+								<CanvasAsset
+									key={a.id}
+									id={a.id}
+									metadata={a}
+									isArrowBeingDrawn={isArrowBeingDrawn}
+									selectedItem={selectedItem}
+									setSelectedItem={this.setSelectedItem}
+									toggleArrowDrawn={(status) => {
+										this.setState({ isArrowBeingDrawn: status });
+									}}
+									deleteAsset={this.deleteAsset}
+									addArrow={this.addArrow}
+									toggleAssetBeingDragged={() => {
+										this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
+									}}
+								/>
+							)
 					);
 				}) }
 				{ arrows.map((a) => {
-					return <Xarrow key={a.id} id={a.id} start={a.startRef} end={a.endRef} />;
+					return (
+						<Arrow
+							key={a.id}
+							id={a.id}
+							start={a.startRef}
+							end={a.endRef}
+							selectedItem={selectedItem}
+							setSelectedItem={this.setSelectedItem}
+							deleteArrow={this.deleteArrow}
+						/>
+					);
 				}) }
 			</Container>
 		);
