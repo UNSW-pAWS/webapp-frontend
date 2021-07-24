@@ -43,7 +43,7 @@ export class Arrow extends React.Component {
 					end={end}
 					onClick={this.handleSelect}
 					strokeWidth={3}
-					color={selectedItem === id ? "red" : "#919191"}
+					color={selectedItem === id ? "#32a852" : "#919191"}
 				/>
 			</div>
 		);
