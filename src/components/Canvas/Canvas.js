@@ -36,7 +36,9 @@ export class Canvas extends React.Component {
 			assets: [],
 			arrows: [],
 			isArrowBeingDrawn: false,
-			selectedItem: null
+			selectedItem: null,
+			assetNextId: 0,
+			arrowNextId: 0
 		};
 	}
 
@@ -67,20 +69,20 @@ export class Canvas extends React.Component {
 	};
 
 	addAsset = (x, y, name) => {
-		const { assets } = this.state;
+		const { assets, assetNextId } = this.state;
 		
-		const assetId = assets.length > 0 
-			? parseInt(assets[assets.length-1].id.split("-").pop()) + 1 
-			: 0;
 		const newAsset = {
-			id: `asset-${assetId}`,
+			id: `asset-${assetNextId}`,
 			x: x,
 			y: y,
 			type: name.toLowerCase(),
 			name: name
 		};
 
-		this.setState({ assets: name.toLowerCase() === "vpc" ? [newAsset, ...assets] : [...assets, newAsset] });
+		this.setState({
+			assets: name.toLowerCase() === "vpc" ? [newAsset, ...assets] : [...assets, newAsset],
+			assetNextId: assetNextId + 1
+		});
 	};
 
 	deleteAsset = (id) => {
@@ -97,20 +99,20 @@ export class Canvas extends React.Component {
 	};
 
 	addArrow = (startRef, endRef, endId) => {
-		const { arrows } = this.state;
+		const { arrows, arrowNextId } = this.state;
 
-		const arrowId = arrows.length > 0 
-			? parseInt(arrows[arrows.length-1].id.split("-").pop()) + 1 
-			: 0;
 		const newArrow = {
-			id: `arrow-${arrowId}`,
+			id: `arrow-${arrowNextId}`,
 			startRef: startRef,
 			endRef: endRef,
 			endId: endId
 		};
 
-		this.setState({ arrows: [...arrows, newArrow] });
-		return `arrow-${arrowId}`;
+		this.setState({
+			arrows: [...arrows, newArrow],
+			arrowNextId: arrowNextId + 1
+		});
+		return `arrow-${newArrow.id}`;
 	}
 
 	deleteArrow = (id) => {
