@@ -8,10 +8,8 @@ import Typography from "@material-ui/core/Typography";
 import { Rnd } from "react-rnd";
 
 import { TopArrowHandler, RightArrowHandler, BottomArrowHandler, LeftArrowHandler } from "../ArrowHandlers";
-import { Grid, Tooltip } from "@material-ui/core";
+import { Tooltip, IconButton } from "@material-ui/core";
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import { IconButton } from "@material-ui/core";
-
 
 import { ec2 } from "../../icons/resources/ec2";
 import { lambda } from "../../icons/resources/lambda";
@@ -150,7 +148,7 @@ export class CanvasAsset extends React.Component {
 	};
 
 	render() {
-		const { classes, id, metadata, isArrowBeingDrawn, selectedItem, toggleArrowDrawn } = this.props;
+		const { classes, id, metadata, isArrowBeingDrawn, selectedItem, toggleArrowDrawn, setDrawerButton } = this.props;
 		const { hovered, arrowHovered, offset, size } = this.state;
 
 		const ResourceIcon = ICONS[metadata.type];
@@ -242,7 +240,7 @@ export class CanvasAsset extends React.Component {
 							<Tooltip title="Open menu">
 								<IconButton 
 									size="small" 
-									onClick={() => this.props.setDrawerButton(this.props.id)}
+									onClick={() => setDrawerButton(this.props.id)}
 								>
 									<ArrowDropDownIcon fontSize="inherit"/>
 								</IconButton>

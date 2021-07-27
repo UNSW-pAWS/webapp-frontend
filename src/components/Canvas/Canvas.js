@@ -112,9 +112,7 @@ export class Canvas extends React.Component {
 			type: name.toLowerCase(),
 			name: name
 		};
-		this.setDrawer(false);
-		this.setState({ assets: [...this.state.assets, newAsset] });
-
+	
 		this.setState({
 			assets: name.toLowerCase() === "vpc" ? [newAsset, ...assets] : [...assets, newAsset],
 			assetNextId: assetNextId + 1
@@ -167,9 +165,7 @@ export class Canvas extends React.Component {
 	}
 
 	setDrawer = (isOpen) => {
-		const { menuOpen } = this.state;
 		this.setState({ menuOpen: isOpen });
-		return;
 	};
 
 	setDrawerButton = (id) => {
@@ -197,13 +193,11 @@ export class Canvas extends React.Component {
 	};
 
 	changeTab = (event, newTab) => {
-		const { tabValue } = this.state;
 		this.setState({ tabValue: newTab });
 	}
 
 	handleChange = (event, index) => {
-		const { tabValue } = this.state;
-		this.setState({tabValue: index});
+		this.setState({ tabValue: index });
 	}
 
 	renderTab = (value) => {

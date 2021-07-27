@@ -67,7 +67,7 @@ export class DependecyTab extends React.Component {
 						<Button 
 							size="medium"
 							variant="contained"
-							onClick={() => this.buttonCheck()}
+							onClick={this.buttonCheck}
 						>
 							{"Check Packages"}
 						</Button>
@@ -76,7 +76,7 @@ export class DependecyTab extends React.Component {
 						<Button 
 							size="medium"
 							variant="contained"
-							onClick={() => this.buttonClear()}
+							onClick={this.buttonClear}
 						>
 							{"Clear"}
 						</Button>
