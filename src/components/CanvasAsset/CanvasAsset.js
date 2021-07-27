@@ -23,11 +23,15 @@ const styles = () => ({
 	assetOverlay: {
 		height: "100%",
 		width: "100%",
-		position: "relative"
+		position: "relative",
+		zIndex: 10
 	},
 	assetBorderGlow: {
 		border: "1px solid #4195FC",
 		boxShadow: "0px 0px 5px #4195FC"
+	},
+	assetSelected: {
+		border: "2px solid #32a852"
 	},
 	asset: {
 		height: "80%",
@@ -77,6 +81,20 @@ export class CanvasAsset extends React.Component {
 		};
 	}
 
+	componentDidMount() {
+		window.addEventListener("keydown", this.handleKeyDown);
+	}
+
+	handleKeyDown = (e) => {
+		const { selectedItem, setSelectedItem, deleteAsset, id } = this.props;
+
+		if (e.key === "Escape" && (selectedItem === id)) {
+			setSelectedItem("");
+		} else if ((e.key === "Delete" || e.key === "Backspace") && (selectedItem === id)) {
+			deleteAsset(id);
+		}
+	}
+
 	onResize = (e, dir, refToElement, delta, position) => {
 		this.props.toggleAssetBeingDragged();
 		this.setState({
@@ -115,13 +133,24 @@ export class CanvasAsset extends React.Component {
 	};
 
 	onDrop = (e) => {
-		this.props.addArrow(e.dataTransfer.getData("parent"), this.componentRef);
-		e.preventDefault();
+		const { id, addArrow, toggleArrowDrawn } = this.props;
+
+		if (e.dataTransfer.getData("type") === "arrow") {
+			addArrow(e.dataTransfer.getData("parent"), this.componentRef, id);
+			toggleArrowDrawn(false);
+			e.preventDefault();
+		}
 		e.stopPropagation();
 	};
 
+	handleSelect = () => {
+		const { id, setSelectedItem } = this.props;
+
+		setSelectedItem(id);
+	};
+
 	render() {
-		const { classes, id, metadata, isArrowBeingDrawn, toggleArrowDrawn } = this.props;
+		const { classes, id, metadata, isArrowBeingDrawn, selectedItem, toggleArrowDrawn } = this.props;
 		const { hovered, arrowHovered, offset, size } = this.state;
 
 		const ResourceIcon = ICONS[metadata.type];
@@ -149,6 +178,7 @@ export class CanvasAsset extends React.Component {
 					}}
 					onDrag={this.onDrag}
 					onResize={this.onResize}
+					onClick={this.handleSelect}
 				>
 					<div
 						ref={this.componentRef}
@@ -203,7 +233,7 @@ export class CanvasAsset extends React.Component {
 						
 						<Paper
 							id={id}
-							className={clsx(classes.asset, isArrowBeingDrawn && classes.assetBorderGlow)}
+							className={clsx(classes.asset, isArrowBeingDrawn && classes.assetBorderGlow, selectedItem === id && classes.assetSelected)}
 							onDragEnter={this.onDragEnter}
 							onDragOver={this.onDragOver}
 							onDragLeave={this.onDragLeave}
@@ -233,10 +263,16 @@ CanvasAsset.propTypes = {
 	id: PropTypes.string.isRequired,
 	metadata: PropTypes.object.isRequired,
 	toggleArrowDrawn: PropTypes.func.isRequired,
+	selectedItem: PropTypes.string,
+	setSelectedItem: PropTypes.func.isRequired,
 	isArrowBeingDrawn: PropTypes.bool.isRequired,
+	deleteAsset: PropTypes.func.isRequired,
 	addArrow: PropTypes.func.isRequired,
-	deleteArrow: PropTypes.func.isRequired,
 	toggleAssetBeingDragged: PropTypes.func.isRequired
+};
+
+CanvasAsset.defaultProps = {
+	selectedItem: null
 };
 
 export default withStyles(styles)(CanvasAsset);

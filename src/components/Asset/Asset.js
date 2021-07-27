@@ -34,7 +34,7 @@ const ICONS = {
 export function Asset({ classes, name }) {
 
 	const onDragStart = (e) => {
-		e.dataTransfer.setData("string", "asset");
+		e.dataTransfer.setData("type", "asset");
 		e.dataTransfer.setData("name", name);
 	};
 

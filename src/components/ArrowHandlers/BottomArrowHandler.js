@@ -24,8 +24,9 @@ function BottomArrowHandler({ classes, componentId, componentRef, toggleArrowHov
 	const [position, setPosition] = React.useState({});
 
 	const onDragStart = (e) => {
+		e.dataTransfer.setData("type", "arrow");
 		e.dataTransfer.setData("parent", componentId);
-		toggleArrowDragging();
+		toggleArrowDragging(true);
 		setIsBeingDragged(true);
 	};
 
@@ -41,7 +42,7 @@ function BottomArrowHandler({ classes, componentId, componentRef, toggleArrowHov
 	};
 
 	const onDragEnd = () => {
-		toggleArrowDragging();
+		toggleArrowDragging(false);
 		setIsBeingDragged(false);
 		setPosition({});
 	};
@@ -64,7 +65,7 @@ function BottomArrowHandler({ classes, componentId, componentRef, toggleArrowHov
 			>
 				<ArrowDropDownIcon fontSize={"large"} />
 			</div>
-			{ isBeingDragged && <Xarrow start={componentRef} end={ref}/>}
+			{ isBeingDragged && <Xarrow start={componentRef} end={ref} color={"#919191"} strokeWidth={3}/>}
 		</React.Fragment>
 	);
 
