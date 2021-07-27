@@ -38,6 +38,7 @@ export class LandingPage extends React.Component {
 		const { assets } = this.state;
 
 		return (
+			
 			<React.Fragment>
 				<Header />
 				<Grid container className={classes.bodyContainer}>

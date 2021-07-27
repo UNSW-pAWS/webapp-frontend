@@ -8,6 +8,8 @@ import Typography from "@material-ui/core/Typography";
 import { Rnd } from "react-rnd";
 
 import { TopArrowHandler, RightArrowHandler, BottomArrowHandler, LeftArrowHandler } from "../ArrowHandlers";
+import { Tooltip, IconButton } from "@material-ui/core";
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 
 import { ec2 } from "../../icons/resources/ec2";
 import { lambda } from "../../icons/resources/lambda";
@@ -40,7 +42,7 @@ const styles = () => ({
 		justifyContent: "center",
 		alignItems: "center",
 		flexDirection: "column"
-	}
+	},
 });
 
 const ICONS = {
@@ -52,7 +54,6 @@ const ICONS = {
 };
 
 export class CanvasAsset extends React.Component {
-
 	constructor(props) {
 		super(props);
 
@@ -74,7 +75,7 @@ export class CanvasAsset extends React.Component {
 			size: {
 				width: 120,
 				height: 120
-			}
+			},
 		};
 	}
 
@@ -147,7 +148,7 @@ export class CanvasAsset extends React.Component {
 	};
 
 	render() {
-		const { classes, id, metadata, isArrowBeingDrawn, selectedItem, toggleArrowDrawn } = this.props;
+		const { classes, id, metadata, isArrowBeingDrawn, selectedItem, toggleArrowDrawn, setDrawerButton } = this.props;
 		const { hovered, arrowHovered, offset, size } = this.state;
 
 		const ResourceIcon = ICONS[metadata.type];
@@ -227,6 +228,7 @@ export class CanvasAsset extends React.Component {
 								/>
 							</>
 						)}
+						
 						<Paper
 							id={id}
 							className={clsx(classes.asset, isArrowBeingDrawn && classes.assetBorderGlow, selectedItem === id && classes.assetSelected)}
@@ -235,6 +237,14 @@ export class CanvasAsset extends React.Component {
 							onDragLeave={this.onDragLeave}
 							onDrop={this.onDrop}
 						>
+							<Tooltip title="Open menu">
+								<IconButton 
+									size="small" 
+									onClick={() => setDrawerButton(this.props.id)}
+								>
+									<ArrowDropDownIcon fontSize="inherit"/>
+								</IconButton>
+							</Tooltip>
 							<ResourceIcon />
 							<Typography>{metadata.name}</Typography>
 						</Paper>

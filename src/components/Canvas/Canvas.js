@@ -1,5 +1,6 @@
-import React from "react";
+import React, { Children } from "react";
 import PropTypes from "prop-types";
+import clsx from "clsx";
 import _ from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -7,9 +8,16 @@ import Container from "@material-ui/core/Container";
 
 import { Arrow } from "../Arrow";
 import { CanvasAsset } from "../CanvasAsset";
+import { Drawer, AppBar, Tabs, Tab } from "@material-ui/core";
 import { VPCAsset } from "../VPCAsset";
 
-const styles = () => ({
+import { DependecyTab, ConfigTab } from "../Tabs";
+
+const drawerWidth = 600;
+var prevAssetID = "asset-0";
+var currAssetID;
+
+const styles = (theme) => ({
 	base: {
 		maxWidth: "100%",
 		height: "100%",
@@ -21,7 +29,30 @@ const styles = () => ({
 	asset: {
 		height: "100%",
 		width: "100%"
+	}, 
+	drawerStyle: {
+		width: drawerWidth,
+		padding: "1rem"
+	},
+	headingStyle: {
+		textAlign: "left",
+	},
+	tab: {
+		minWidth: "33%",
+		height: "20%",
+		borderRight: "2px solid #FF9900"
+	},
+	activeTab: {
+		backgroundColor: "rgb(255, 153, 0, 0.3)",
+		borderRight: "4px solid #FF9900"
+	},
+	tabs: {
+		width: "100%",
+		"& .MuiTabs-flexContainerHorizontal": {
+			width: "10%"
+		}
 	}
+
 });
 
 export class Canvas extends React.Component {
@@ -36,6 +67,8 @@ export class Canvas extends React.Component {
 			assets: [],
 			arrows: [],
 			isArrowBeingDrawn: false,
+			menuOpen: false,
+			tabValue: 0,
 			selectedItem: null,
 			assetNextId: 0,
 			arrowNextId: 0
@@ -55,6 +88,7 @@ export class Canvas extends React.Component {
 	onDragLeave = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
+		this.setDrawer(false);
 	};
 
 	onDrop = (e) => {
@@ -78,7 +112,7 @@ export class Canvas extends React.Component {
 			type: name.toLowerCase(),
 			name: name
 		};
-
+	
 		this.setState({
 			assets: name.toLowerCase() === "vpc" ? [newAsset, ...assets] : [...assets, newAsset],
 			assetNextId: assetNextId + 1
@@ -130,19 +164,123 @@ export class Canvas extends React.Component {
 		this.setState({ selectedItem: id });
 	}
 
+	setDrawer = (isOpen) => {
+		this.setState({ menuOpen: isOpen });
+	};
+
+	setDrawerButton = (id) => {
+		const { menuOpen } = this.state;
+
+		var currID = 0;
+		var prevID = 0;
+		// extracts the integer ID from assetID
+		currID = id.match(/\d/g);
+		currID = parseInt(currID.join(""));
+
+		prevID = prevAssetID.match(/\d/g);
+		prevID = parseInt(prevID.join(""));
+
+		if(currID != prevID && menuOpen == true) {
+			//quick refresh of drawer to current asset
+			this.setDrawer(false);
+			this.setDrawer(true);
+		}
+		else {
+			this.setDrawer(!menuOpen);
+		}
+		currAssetID = id;
+		prevAssetID = currAssetID;
+	};
+
+	changeTab = (event, newTab) => {
+		this.setState({ tabValue: newTab });
+	}
+
+	handleChange = (event, index) => {
+		this.setState({ tabValue: index });
+	}
+
+	renderTab = (value) => {
+		switch(value) {
+			case 0:
+				return (
+					<DependecyTab
+						id={ currAssetID }
+					/>
+				)
+
+			case 1:
+				return (
+					<ConfigTab/>
+				)
+
+			case 2:
+				return(
+					<div>hello</div>
+				)
+			default: {
+				return(
+					<DependecyTab/>
+				)
+			}
+		}
+	}
+
+	// try work out how to use material-ui tabs, react tabs look crap
+	// but im sick of trying rn so this is a functional workaround
+	DrawerContents = () => {
+		const { classes } = this.props;
+		const { tabValue } = this.state;
+		return (
+			<div className={classes.drawerStyle}>
+				<h2 className={classes.headingStyle}>
+					{currAssetID}
+				</h2>
+
+				<AppBar position="static">
+					<Tabs 
+						variant={"fullWidth"}
+						value={tabValue} 
+						onChange={this.handleChange} 
+						aria-label="simple tabs example"
+					>
+						<Tab label="item 1" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>
+						<Tab label="item 2" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
+						<Tab label="item 3" className={clsx(classes.tab, tabValue === 2 && classes.activeTab)} value={2}/>
+					</Tabs>
+				</AppBar>
+				<div>
+					{ this.renderTab(tabValue) }
+				</div>
+			</div>
+		);
+	};
+
 	render() {
 		const { classes } = this.props;
-		const { assets, arrows, isArrowBeingDrawn, selectedItem, isAssetBeingDragged } = this.state;
+		const { assets, arrows, isArrowBeingDrawn, selectedItem, isAssetBeingDragged, menuOpen } = this.state;
 
 		return (
+			
 			<Container
 				ref={this.canvasRef}
 				className={classes.base}
 				onDragEnter={this.onDragEnter}
 				onDragOver={this.onDragOver}
 				onDragLeave={this.onDragLeave}
+				onDragEnd={this.onDragEnd}
 				onDrop={this.onDrop}
 			>
+				<Drawer 
+					anchor="right"
+					variant="persistent"
+					open={menuOpen}
+					onClose={() => this.setDrawer(false)}
+					className={classes.drawerStyle}
+				>
+					{this.DrawerContents()}
+				</Drawer>
+
 				{ assets.map((a) => {
 					return (
 						a.type === "vpc"
@@ -171,6 +309,7 @@ export class Canvas extends React.Component {
 									}}
 									deleteAsset={this.deleteAsset}
 									addArrow={this.addArrow}
+									setDrawerButton={this.setDrawerButton}
 									toggleAssetBeingDragged={() => {
 										this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
 									}}
@@ -188,18 +327,22 @@ export class Canvas extends React.Component {
 							selectedItem={selectedItem}
 							setSelectedItem={this.setSelectedItem}
 							deleteArrow={this.deleteArrow}
+							toggleAssetBeingDragged={() => {
+								this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
+							}}
+							setDrawerButton={this.setDrawerButton}
 						/>
 					);
 				}) }
 			</Container>
+			
 		);
 	}
-
 }
 
 Canvas.propTypes = {
 	classes: PropTypes.object.isRequired,
-	children: PropTypes.array.isRequired
+	children: PropTypes.array.isRequired,
 };
 
 export default withStyles(styles)(Canvas);
