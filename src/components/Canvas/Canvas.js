@@ -197,13 +197,11 @@ export class Canvas extends React.Component {
 	};
 
 	changeTab = (event, newTab) => {
-		console.log(newTab);
 		const { tabValue } = this.state;
 		this.setState({ tabValue: newTab });
 	}
 
 	handleChange = (event, index) => {
-		console.log(index);
 		const { tabValue } = this.state;
 		this.setState({tabValue: index});
 	}
@@ -291,8 +289,6 @@ export class Canvas extends React.Component {
 
 				{ assets.map((a) => {
 					return (
-						
-						<CanvasAsset
 						a.type === "vpc"
 							? (
 								<VPCAsset
@@ -319,6 +315,7 @@ export class Canvas extends React.Component {
 									}}
 									deleteAsset={this.deleteAsset}
 									addArrow={this.addArrow}
+									setDrawerButton={this.setDrawerButton}
 									toggleAssetBeingDragged={() => {
 										this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
 									}}
