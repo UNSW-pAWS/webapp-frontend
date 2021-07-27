@@ -73,7 +73,7 @@ export class CanvasAsset extends React.Component {
 			size: {
 				width: 120,
 				height: 120
-			}
+			},
 		};
 	}
 
@@ -210,7 +210,10 @@ export class CanvasAsset extends React.Component {
 							onDrop={this.onDrop}
 						>
 							<Tooltip title="Open menu">
-								<IconButton size="small" onClick={() => this.props.setDrawerButton(this.props.id)}>
+								<IconButton 
+									size="small" 
+									onClick={() => this.props.setDrawerButton(this.props.id)}
+								>
 									<ArrowDropDownIcon fontSize="inherit"/>
 								</IconButton>
 							</Tooltip>

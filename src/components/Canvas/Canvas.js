@@ -1,18 +1,21 @@
-import React from "react";
+import React, { Children } from "react";
 import PropTypes from "prop-types";
+import clsx from "clsx";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Xarrow from "react-xarrows";
 
 import { CanvasAsset } from "../CanvasAsset";
-import { Button, Drawer, Grid, TextField, AppBar, Tabs, Tab, Box, Typography } from "@material-ui/core";
+import { Drawer, AppBar, Tabs, Tab } from "@material-ui/core";
+
+import { DependecyTab, ConfigTab } from "../Tabs";
 
 const drawerWidth = 600;
 var prevAssetID = "asset-0";
 var currAssetID;
 
-const styles = () => ({
+const styles = (theme) => ({
 	base: {
 		maxWidth: "100%",
 		height: "100%",
@@ -32,31 +35,23 @@ const styles = () => ({
 	headingStyle: {
 		textAlign: "left",
 	},
-	buttonStyle: {
-		textAlign: "left"
+	tab: {
+		minWidth: "33%",
+		height: "20%",
+		borderRight: "2px solid #FF9900"
+	},
+	activeTab: {
+		backgroundColor: "rgb(255, 153, 0, 0.3)",
+		borderRight: "4px solid #FF9900"
+	},
+	tabs: {
+		width: "100%",
+		"& .MuiTabs-flexContainerHorizontal": {
+			width: "10%"
+		}
 	}
 
 });
-
-function TabPanel(props) {
-	const { children, value, index, ...other } = props;
-  
-	return (
-		<div
-			role="tabpanel"
-			hidden={value !== index}
-			id={`simple-tabpanel-${index}`}
-			aria-labelledby={`simple-tab-${index}`}
-			{...other}
-		>
-			{value === index && (
-			<Box p={3}>
-				<Typography>{children}</Typography>
-			</Box>
-			)}
-		</div>
-	);	
-}
 
 export class Canvas extends React.Component {
 
@@ -69,7 +64,7 @@ export class Canvas extends React.Component {
 			arrows: [],
 			isArrowBeingDrawn: false,
 			menuOpen: false,
-			tabValue: 0
+			tabValue: 0,
 		};
 	}
 
@@ -146,7 +141,6 @@ export class Canvas extends React.Component {
 
 		var currID = 0;
 		var prevID = 0;
-
 		// extracts the integer ID from assetID
 		currID = id.match(/\d/g);
 		currID = parseInt(currID.join(""));
@@ -177,7 +171,32 @@ export class Canvas extends React.Component {
 		const { tabValue } = this.state;
 		this.setState({tabValue: index});
 	}
-	
+
+	renderTab = (value) => {
+		switch(value) {
+			case 0:
+				return (
+					<DependecyTab
+						id={ currAssetID }
+					/>
+				)
+
+			case 1:
+				return (
+					<ConfigTab/>
+				)
+
+			case 2:
+				return(
+					<div>hello</div>
+				)
+			default: {
+				return(
+					<DependecyTab/>
+				)
+			}
+		}
+	}
 
 	// try work out how to use material-ui tabs, react tabs look crap
 	// but im sick of trying rn so this is a functional workaround
@@ -191,53 +210,20 @@ export class Canvas extends React.Component {
 				</h2>
 
 				<AppBar position="static">
-					<Tabs value={tabValue} onChange={() => this.handleChange} aria-label="simple tabs example">
-					<Tab label="Item One"/>
-					<Tab label="Item Two"/>
-					<Tab label="Item Three"/>
+					<Tabs 
+						variant={"fullWidth"}
+						value={tabValue} 
+						onChange={this.handleChange} 
+						aria-label="simple tabs example"
+					>
+						<Tab label="item 1" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>
+						<Tab label="item 2" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
+						<Tab label="item 3" className={clsx(classes.tab, tabValue === 2 && classes.activeTab)} value={2}/>
 					</Tabs>
 				</AppBar>
-				<TabPanel value={tabValue} index={0}>
-					Item One
-				</TabPanel>
-
-				{/* <Tabs value={tabValue} onChange={this.changeTab}>
-					<AppBar position="static">
-						<TabList>
-							<Tab>Package Vulnerability</Tab>
-							<Tab>Configurations</Tab>
-							<Tab>idk</Tab>
-						</TabList>
-					</AppBar>
-					<TabPanel>
-						<Grid item xs={12}>
-						<TextField
-							fullWidth
-							variant="outlined"
-							placeholder="Enter your package names"
-							multiline
-							rows={10}
-							rowsMax={10}
-						/>
-						</Grid>
-						<div className={classes.buttonStyle}>
-							<Button 
-								size="medium"
-								variant="contained"
-							>
-								{"check packages"}
-							</Button>
-						</div>
-					</TabPanel>
-
-					<TabPanel>
-						hello
-					</TabPanel>
-
-					<TabPanel>
-						sfssfsfsf
-					</TabPanel>
-				</Tabs>	 */}
+				<div>
+					{ this.renderTab(tabValue) }
+				</div>
 			</div>
 		);
 	};
@@ -256,11 +242,12 @@ export class Canvas extends React.Component {
 				onDragEnd={this.onDragEnd}
 				onDrop={this.onDrop}
 			>
-				<Drawer anchor="right"
-				variant="persistent"
-				open={menuOpen}
-				onClose={() => this.setDrawer(false)}
-				className={classes.drawerStyle}
+				<Drawer 
+					anchor="right"
+					variant="persistent"
+					open={menuOpen}
+					onClose={() => this.setDrawer(false)}
+					className={classes.drawerStyle}
 				>
 					{this.DrawerContents()}
 				</Drawer>
