@@ -1,7 +1,7 @@
 /* eslint-disable linebreak-style */
 import React from "react";
 import PropTypes from "prop-types";
-
+import axios from "axios";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -22,13 +22,30 @@ export class DependecyTab extends React.Component {
 		super(props);
 
 		this.state = {
-			strings: []
+			input: "",
+			results: [],
+			level: [],
 		}
-	}
+	};
 
+	//TODO
+	// change button to loading button because api call is slow
+	// pull user input from textfield into package_list - move to state
 
 	buttonCheck = () => {
-		console.log(this.props.id);
+		const request = {
+			"package_manager_type" : "npm",
+			"package_list" : ["react"],
+		}
+
+		axios.post("http://localhost:5000/threat/search", request, {
+			headers: {"Content-Type": "application/json"}
+		}).then(response => {
+			console.log(response.data);
+		})
+
+		
+			
 	};
 
 	buttonClear = () => {
@@ -36,14 +53,12 @@ export class DependecyTab extends React.Component {
 	};
 
 	updateValue = (e) => {
-		const { strings } = this.state;
 		var newStr = e.target.value;
 		console.log(newStr);
 
 	}
 
 	render() {
-		const { classes } = this.props;
 		const { string } = this.state;
 
 		return (
