@@ -117,9 +117,9 @@ export class Canvas extends React.Component {
 			name: name
 		};
 		
-		var newArr = dependencyTab;
-		if(assetNextId >= newArr.length) {
-			newArr.push({
+		// dynamically extend array
+		if(assetNextId >= dependencyTab.length) {
+			dependencyTab.push({
 				input: "",
 				result: "",
 				depth: 1
@@ -130,7 +130,6 @@ export class Canvas extends React.Component {
 			assets: name.toLowerCase() === "vpc" ? [newAsset, ...assets] : [...assets, newAsset],
 			assetNextId: assetNextId + 1
 		});
-
 	};
 
 	deleteAsset = (id) => {
@@ -180,16 +179,14 @@ export class Canvas extends React.Component {
 
 	setDrawer = (isOpen) => {
 		this.setState({ menuOpen: isOpen });
+		this.setState({ selectedItem: null });
 	};
 
 	setDrawerButton = (id) => {
 		const { menuOpen } = this.state;
 
-		var currID = 0;
-		var prevID = 0;
-
-		currID = this.getIntID(id);
-		prevID = this.getIntID(prevAssetID);
+		var currID = this.getIntID(id);
+		var prevID = this.getIntID(prevAssetID);
 
 		if(currID != prevID && menuOpen == true) {
 			//quick refresh of drawer to current asset
@@ -198,7 +195,8 @@ export class Canvas extends React.Component {
 		}
 		else {
 			this.setDrawer(!menuOpen);
-		}
+		};
+
 		currAssetID = id;
 		prevAssetID = currAssetID;
 
@@ -209,43 +207,45 @@ export class Canvas extends React.Component {
 		var intID = id.match(/\d/g);
 		intID = parseInt(intID.join(""));
 		return intID;
-	}
+	};
 
 	changeTab = (event, index) => {
+		console.log("change tab", index)
 		this.setState({ tabValue: index });
 	};
 
 	updateDependencyTab = (id, input, result, depth) => {
 		const { dependencyTab } = this.state;
-		var newArr = dependencyTab;
+		var newArr = [...dependencyTab];
 		newArr[id].input = input;
 		newArr[id].result = result;
 		newArr[id].depth = depth;
-
+		
+		console.log(JSON.stringify(newArr[id]), JSON.stringify(dependencyTab[id]))
 		if(JSON.stringify(newArr[id]) != JSON.stringify(dependencyTab[id])) {
+			console.log("hdsjhdsjdhsjdhsj")
 			this.setState({ dependencyTab: newArr });
-		}
-	}
+			return;
+		};
+	};
 
 	renderTab = (value) => {
+		const { dependencyTab } = this.state;
+		var currID = this.getIntID(currAssetID);
+
 		switch(value) {
 		case 0:
 			return (
 				<DependecyTab
-					id={this.getIntID(currAssetID)}
+					id={currID}
 					updateTab={this.updateDependencyTab}
-					data={this.state.dependencyTab[this.getIntID(currAssetID)]}
+					data={dependencyTab[currID]}
 				/>
 			);
 		case 1:
 			return (
 				<ConfigTab/>
 			);
-		default: {
-			return(
-				<DependecyTab/>
-			);
-		};
 		};
 	};
 

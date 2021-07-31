@@ -65,7 +65,7 @@ export class DependecyTab extends React.Component {
 		else {
 			this.setState({ result: "Input must be in the form PACKAGE1, PACKAGE2, PACKAGE3..."});
 			this.setState({ disableSearch: false });
-		}
+		};
 		
 	};
 
@@ -77,7 +77,7 @@ export class DependecyTab extends React.Component {
 	updateValue = (e) => {
 		var newStr = e.target.value;
 		this.setState({ input: newStr });
-	}
+	};
 
 	incrementDepth = () => {
 		const { depth } = this.state;
@@ -87,7 +87,7 @@ export class DependecyTab extends React.Component {
 			newDepth++;
 			this.setState({ depth: newDepth });
 		};
-	}
+	};
 
 	decrementDepth = () => {
 		const { depth } = this.state;
@@ -97,13 +97,12 @@ export class DependecyTab extends React.Component {
 			newDepth--;
 			this.setState({ depth: newDepth });
 		};
-	}
+	};
 
 	componentDidUpdate() {
 		const { data, updateTab } = this.props;
 		const { input, result, depth } = this.state;
 
-		//load from parent
 		if(currID != prevID) {
 			this.setState({ input: data.input });
 			this.setState({ result: data.result });
@@ -112,8 +111,16 @@ export class DependecyTab extends React.Component {
 		}
 		else {
 			updateTab(currID, input, result, depth);
-		}
-		
+		};	
+	};
+
+	componentDidMount() {
+		// load data immediately on load or else update will overrite
+		const { data } = this.props;
+		this.setState({ input: data.input });
+		this.setState({ result: data.result });
+		this.setState({ depth: data.depth });
+		prevID = currID;
 	}
 
 	render() {
@@ -193,8 +200,8 @@ export class DependecyTab extends React.Component {
 				</Grid>
 			</div>
 		);
-	}
-}
+	};
+};
 
 DependecyTab.propTypes = {
 	classes: PropTypes.object.isRequired,
