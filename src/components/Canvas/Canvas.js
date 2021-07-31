@@ -1,21 +1,20 @@
-import React, { Children } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 import _ from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { Drawer, AppBar, Tabs, Tab, Grid, Button } from "@material-ui/core";
 
 import { Arrow } from "../Arrow";
 import { CanvasAsset } from "../CanvasAsset";
-import { Drawer, AppBar, Tabs, Tab } from "@material-ui/core";
 import { VPCAsset } from "../VPCAsset";
-
 import { DependecyTab, ConfigTab } from "../Tabs";
 
-const drawerWidth = 600;
+const drawerWidth = 800;
 var prevAssetID = "asset-0";
-var currAssetID;
+var currAssetID = "asset-0";
 
 const styles = (theme) => ({
 	base: {
@@ -173,12 +172,9 @@ export class Canvas extends React.Component {
 
 		var currID = 0;
 		var prevID = 0;
-		// extracts the integer ID from assetID
-		currID = id.match(/\d/g);
-		currID = parseInt(currID.join(""));
 
-		prevID = prevAssetID.match(/\d/g);
-		prevID = parseInt(prevID.join(""));
+		currID = this.getIntID(id);
+		prevID = this.getIntID(prevAssetID);
 
 		if(currID != prevID && menuOpen == true) {
 			//quick refresh of drawer to current asset
@@ -190,52 +186,66 @@ export class Canvas extends React.Component {
 		}
 		currAssetID = id;
 		prevAssetID = currAssetID;
+
+		this.setState({ selectedItem: null });
 	};
+
+	getIntID = (id) => {
+		var intID = id.match(/\d/g);
+		intID = parseInt(intID.join(""));
+		return intID;
+	}
 
 	changeTab = (event, newTab) => {
 		this.setState({ tabValue: newTab });
-	}
+	};
 
 	handleChange = (event, index) => {
 		this.setState({ tabValue: index });
-	}
+	};
 
 	renderTab = (value) => {
 		switch(value) {
-			case 0:
-				return (
-					<DependecyTab
-						id={ currAssetID }
-					/>
-				)
+		case 0:
+			return (
+				<DependecyTab
+					id={ this.getIntID(currAssetID) }
+				/>
+			);
+		case 1:
+			return (
+				<ConfigTab/>
+			);
+		default: {
+			return(
+				<DependecyTab/>
+			);
+		};
+		};
+	};
 
-			case 1:
-				return (
-					<ConfigTab/>
-				)
-
-			case 2:
-				return(
-					<div>hello</div>
-				)
-			default: {
-				return(
-					<DependecyTab/>
-				)
-			}
-		}
-	}
-
-	// try work out how to use material-ui tabs, react tabs look crap
-	// but im sick of trying rn so this is a functional workaround
 	DrawerContents = () => {
 		const { classes } = this.props;
 		const { tabValue } = this.state;
 		return (
 			<div className={classes.drawerStyle}>
-				<h2 className={classes.headingStyle}>
-					{currAssetID}
-				</h2>
+				<Grid container spacing={3}>
+					<Grid item xs={2}>
+						<h2 className={classes.headingStyle}>
+							{currAssetID}
+						</h2>
+					</Grid>
+					<Grid item xs={2}>
+						<Button
+							onClick={() => this.setDrawer(false)}
+							size="small"
+							variant="outlined"
+						>
+							Close menu
+						</Button>
+					</Grid>
+				</Grid>
+				<p>i cant design for shit</p>
 
 				<AppBar position="static">
 					<Tabs 
@@ -246,7 +256,6 @@ export class Canvas extends React.Component {
 					>
 						<Tab label="item 1" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>
 						<Tab label="item 2" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
-						<Tab label="item 3" className={clsx(classes.tab, tabValue === 2 && classes.activeTab)} value={2}/>
 					</Tabs>
 				</AppBar>
 				<div>
