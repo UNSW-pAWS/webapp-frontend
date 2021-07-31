@@ -210,7 +210,6 @@ export class Canvas extends React.Component {
 	};
 
 	changeTab = (event, index) => {
-		console.log("change tab", index)
 		this.setState({ tabValue: index });
 	};
 
@@ -221,9 +220,7 @@ export class Canvas extends React.Component {
 		newArr[id].result = result;
 		newArr[id].depth = depth;
 		
-		console.log(JSON.stringify(newArr[id]), JSON.stringify(dependencyTab[id]))
 		if(JSON.stringify(newArr[id]) != JSON.stringify(dependencyTab[id])) {
-			console.log("hdsjhdsjdhsjdhsj")
 			this.setState({ dependencyTab: newArr });
 			return;
 		};
