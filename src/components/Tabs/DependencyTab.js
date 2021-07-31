@@ -110,7 +110,6 @@ export class DependecyTab extends React.Component {
 			prevID = currID;
 		}
 		else {
-			console.log(currID)
 			updateTab(currID, input, result, depth);
 		};	
 	};
