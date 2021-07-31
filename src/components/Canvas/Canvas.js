@@ -1,21 +1,20 @@
-import React, { Children } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import _ from "lodash";
+import _, { get } from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { Drawer, AppBar, Tabs, Tab, Grid, Button } from "@material-ui/core";
 
 import { Arrow } from "../Arrow";
 import { CanvasAsset } from "../CanvasAsset";
-import { Drawer, AppBar, Tabs, Tab } from "@material-ui/core";
 import { VPCAsset } from "../VPCAsset";
-
 import { DependecyTab, ConfigTab } from "../Tabs";
 
-const drawerWidth = 600;
+const drawerWidth = 800;
 var prevAssetID = "asset-0";
-var currAssetID;
+var currAssetID = "asset-0";
 
 const styles = (theme) => ({
 	base: {
@@ -71,7 +70,12 @@ export class Canvas extends React.Component {
 			tabValue: 0,
 			selectedItem: null,
 			assetNextId: 0,
-			arrowNextId: 0
+			arrowNextId: 0,
+			dependencyTab: [{
+				input: "",
+				result: "",
+				depth: 1,
+			}],
 		};
 	}
 
@@ -103,7 +107,7 @@ export class Canvas extends React.Component {
 	};
 
 	addAsset = (x, y, name) => {
-		const { assets, assetNextId } = this.state;
+		const { assets, assetNextId, dependencyTab } = this.state;
 		
 		const newAsset = {
 			id: `asset-${assetNextId}`,
@@ -112,7 +116,16 @@ export class Canvas extends React.Component {
 			type: name.toLowerCase(),
 			name: name
 		};
-	
+		
+		// dynamically extend array
+		if(assetNextId >= dependencyTab.length) {
+			dependencyTab.push({
+				input: "",
+				result: "",
+				depth: 1
+			});
+		};
+
 		this.setState({
 			assets: name.toLowerCase() === "vpc" ? [newAsset, ...assets] : [...assets, newAsset],
 			assetNextId: assetNextId + 1
@@ -166,19 +179,14 @@ export class Canvas extends React.Component {
 
 	setDrawer = (isOpen) => {
 		this.setState({ menuOpen: isOpen });
+		this.setState({ selectedItem: null });
 	};
 
 	setDrawerButton = (id) => {
 		const { menuOpen } = this.state;
 
-		var currID = 0;
-		var prevID = 0;
-		// extracts the integer ID from assetID
-		currID = id.match(/\d/g);
-		currID = parseInt(currID.join(""));
-
-		prevID = prevAssetID.match(/\d/g);
-		prevID = parseInt(prevID.join(""));
+		var currID = this.getIntID(id);
+		var prevID = this.getIntID(prevAssetID);
 
 		if(currID != prevID && menuOpen == true) {
 			//quick refresh of drawer to current asset
@@ -187,66 +195,88 @@ export class Canvas extends React.Component {
 		}
 		else {
 			this.setDrawer(!menuOpen);
-		}
+		};
+
 		currAssetID = id;
 		prevAssetID = currAssetID;
+
+		this.setState({ selectedItem: null });
 	};
 
-	changeTab = (event, newTab) => {
-		this.setState({ tabValue: newTab });
-	}
+	getIntID = (id) => {
+		var intID = id.match(/\d/g);
+		intID = parseInt(intID.join(""));
+		return intID;
+	};
 
-	handleChange = (event, index) => {
+	changeTab = (event, index) => {
 		this.setState({ tabValue: index });
-	}
+	};
+
+	updateDependencyTab = (id, input, result, depth) => {
+		const { dependencyTab } = this.state;
+		var newArr = [...dependencyTab];
+		newArr[id].input = input;
+		newArr[id].result = result;
+		newArr[id].depth = depth;
+		
+		if(JSON.stringify(newArr[id]) != JSON.stringify(dependencyTab[id])) {
+			this.setState({ dependencyTab: newArr });
+			return;
+		};
+	};
 
 	renderTab = (value) => {
+		const { dependencyTab } = this.state;
+		var currID = this.getIntID(currAssetID);
+
 		switch(value) {
-			case 0:
-				return (
-					<DependecyTab
-						id={ currAssetID }
-					/>
-				)
+		case 0:
+			return (
+				<DependecyTab
+					id={currID}
+					updateTab={this.updateDependencyTab}
+					data={dependencyTab[currID]}
+				/>
+			);
+		case 1:
+			return (
+				<ConfigTab/>
+			);
+		};
+	};
 
-			case 1:
-				return (
-					<ConfigTab/>
-				)
-
-			case 2:
-				return(
-					<div>hello</div>
-				)
-			default: {
-				return(
-					<DependecyTab/>
-				)
-			}
-		}
-	}
-
-	// try work out how to use material-ui tabs, react tabs look crap
-	// but im sick of trying rn so this is a functional workaround
 	DrawerContents = () => {
 		const { classes } = this.props;
 		const { tabValue } = this.state;
 		return (
 			<div className={classes.drawerStyle}>
-				<h2 className={classes.headingStyle}>
-					{currAssetID}
-				</h2>
+				<Grid container spacing={3}>
+					<Grid item xs={2}>
+						<h2 className={classes.headingStyle}>
+							{currAssetID}
+						</h2>
+					</Grid>
+					<Grid item xs={2}>
+						<Button
+							onClick={() => this.setDrawer(false)}
+							size="small"
+							variant="outlined"
+						>
+							Close menu
+						</Button>
+					</Grid>
+				</Grid>
 
 				<AppBar position="static">
 					<Tabs 
 						variant={"fullWidth"}
 						value={tabValue} 
-						onChange={this.handleChange} 
+						onChange={this.changeTab} 
 						aria-label="simple tabs example"
 					>
 						<Tab label="item 1" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>
 						<Tab label="item 2" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
-						<Tab label="item 3" className={clsx(classes.tab, tabValue === 2 && classes.activeTab)} value={2}/>
 					</Tabs>
 				</AppBar>
 				<div>
