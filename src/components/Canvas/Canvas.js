@@ -5,17 +5,34 @@ import _ from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import Drawer from "@material-ui/core/Drawer";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Typography from "@material-ui/core/Typography";
 
 import { Arrow } from "../Arrow";
 import { CanvasAsset } from "../CanvasAsset";
-import { Drawer, AppBar, Tabs, Tab } from "@material-ui/core";
 import { VPCAsset } from "../VPCAsset";
-
 import { DependecyTab, ConfigTab } from "../Tabs";
+
+import { LAMBDA_OPTIONS } from "../../resources/LambdaConfigOptions";
+import { RDS_OPTIONS } from "../../resources/RDSConfigOptions";
+import { S3_OPTIONS } from "../../resources/S3ConfigOptions";
+import { VPC_OPTIONS } from "../../resources/VPCConfigOptions";
+import { EC2_OPTIONS } from "../../resources/EC2ConfigOptions";
 
 const drawerWidth = 600;
 var prevAssetID = "asset-0";
 var currAssetID;
+
+const OPTIONS_MAP = {
+	"EC2": EC2_OPTIONS,
+	"Lambda": LAMBDA_OPTIONS,
+	"RDS": RDS_OPTIONS,
+	"S3": S3_OPTIONS,
+	"VPC": VPC_OPTIONS
+}
 
 const styles = (theme) => ({
 	base: {
@@ -36,6 +53,7 @@ const styles = (theme) => ({
 	},
 	headingStyle: {
 		textAlign: "left",
+		marginBottom: "0.25em",
 	},
 	tab: {
 		minWidth: "33%",
@@ -70,6 +88,7 @@ export class Canvas extends React.Component {
 			menuOpen: false,
 			tabValue: 0,
 			selectedItem: null,
+			currentDrawerAsset: {},
 			assetNextId: 0,
 			arrowNextId: 0
 		};
@@ -110,7 +129,8 @@ export class Canvas extends React.Component {
 			x: x,
 			y: y,
 			type: name.toLowerCase(),
-			name: name
+			name: name,
+			options: OPTIONS_MAP[name]
 		};
 	
 		this.setState({
@@ -169,27 +189,14 @@ export class Canvas extends React.Component {
 	};
 
 	setDrawerButton = (id) => {
-		const { menuOpen } = this.state;
+		const { assets } = this.state;
 
-		var currID = 0;
-		var prevID = 0;
-		// extracts the integer ID from assetID
-		currID = id.match(/\d/g);
-		currID = parseInt(currID.join(""));
+		const currAsset = assets.find((a) => a.id === id)
 
-		prevID = prevAssetID.match(/\d/g);
-		prevID = parseInt(prevID.join(""));
-
-		if(currID != prevID && menuOpen == true) {
-			//quick refresh of drawer to current asset
-			this.setDrawer(false);
-			this.setDrawer(true);
-		}
-		else {
-			this.setDrawer(!menuOpen);
-		}
-		currAssetID = id;
-		prevAssetID = currAssetID;
+		this.setState({
+			currentDrawerAsset: currAsset,
+			menuOpen: true
+		});
 	};
 
 	changeTab = (event, newTab) => {
@@ -201,42 +208,42 @@ export class Canvas extends React.Component {
 	}
 
 	renderTab = (value) => {
+		const { currentDrawerAsset } = this.state;
+
 		switch(value) {
 			case 0:
 				return (
 					<DependecyTab
-						id={ currAssetID }
+						asset={currentDrawerAsset}
 					/>
 				)
 
 			case 1:
 				return (
-					<ConfigTab/>
+					<ConfigTab asset={currentDrawerAsset} />
 				)
 
 			case 2:
-				return(
-					<div>hello</div>
+				return (
+					<DependecyTab
+						asset={currentDrawerAsset}
+					/>
 				)
 			default: {
-				return(
-					<DependecyTab/>
-				)
+				return;
 			}
 		}
 	}
 
-	// try work out how to use material-ui tabs, react tabs look crap
-	// but im sick of trying rn so this is a functional workaround
 	DrawerContents = () => {
 		const { classes } = this.props;
-		const { tabValue } = this.state;
+		const { tabValue, currentDrawerAsset } = this.state;
+
 		return (
 			<div className={classes.drawerStyle}>
-				<h2 className={classes.headingStyle}>
-					{currAssetID}
-				</h2>
-
+				<Typography className={classes.headingStyle} variant={"h5"}>
+					{currentDrawerAsset && currentDrawerAsset.id}
+				</Typography>
 				<AppBar position="static">
 					<Tabs 
 						variant={"fullWidth"}
@@ -244,9 +251,9 @@ export class Canvas extends React.Component {
 						onChange={this.handleChange} 
 						aria-label="simple tabs example"
 					>
-						<Tab label="item 1" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>
-						<Tab label="item 2" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
-						<Tab label="item 3" className={clsx(classes.tab, tabValue === 2 && classes.activeTab)} value={2}/>
+						<Tab label="General" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>
+						<Tab label="Configuration" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
+						<Tab label="Dependency Checker" className={clsx(classes.tab, tabValue === 2 && classes.activeTab)} value={2}/>
 					</Tabs>
 				</AppBar>
 				<div>
