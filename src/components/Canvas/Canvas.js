@@ -5,22 +5,19 @@ import _, { get } from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-<<<<<<< HEAD
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
-=======
-import { Drawer, AppBar, Tabs, Tab, Grid, Button } from "@material-ui/core";
->>>>>>> b5a928d128b149c0ade86b67463c26048fbf0044
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
 
 import { Arrow } from "../Arrow";
 import { CanvasAsset } from "../CanvasAsset";
 import { VPCAsset } from "../VPCAsset";
 import { DependecyTab, ConfigTab } from "../Tabs";
 
-<<<<<<< HEAD
 import { LAMBDA_OPTIONS } from "../../resources/LambdaConfigOptions";
 import { RDS_OPTIONS } from "../../resources/RDSConfigOptions";
 import { S3_OPTIONS } from "../../resources/S3ConfigOptions";
@@ -28,9 +25,6 @@ import { VPC_OPTIONS } from "../../resources/VPCConfigOptions";
 import { EC2_OPTIONS } from "../../resources/EC2ConfigOptions";
 
 const drawerWidth = 600;
-=======
-const drawerWidth = 800;
->>>>>>> b5a928d128b149c0ade86b67463c26048fbf0044
 var prevAssetID = "asset-0";
 var currAssetID = "asset-0";
 
