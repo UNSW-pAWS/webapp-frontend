@@ -240,13 +240,17 @@ export class Canvas extends React.Component {
 	};
 
 	renderTab = (value) => {
-		const { currentDrawerAsset } = this.state;
+		const { currentDrawerAsset, dependencyTab } = this.state;
+		var currID = this.getIntID(currAssetID);
 
 		switch(value) {
 			case 0:
 				return (
 					<DependecyTab
+						id={currID}
+						updateTab={this.updateDependencyTab}
 						asset={currentDrawerAsset}
+						data={dependencyTab[currID]}
 					/>
 				)
 
@@ -258,7 +262,9 @@ export class Canvas extends React.Component {
 			case 2:
 				return (
 					<DependecyTab
+						updateTab={this.updateDependencyTab}
 						asset={currentDrawerAsset}
+						data={dependencyTab[currID]}
 					/>
 				)
 			default: {
