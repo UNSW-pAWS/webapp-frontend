@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import _ from "lodash";
+import _, { get } from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -70,7 +70,12 @@ export class Canvas extends React.Component {
 			tabValue: 0,
 			selectedItem: null,
 			assetNextId: 0,
-			arrowNextId: 0
+			arrowNextId: 0,
+			dependencyTab: [{
+				input: "",
+				result: "",
+				depth: 1,
+			}],
 		};
 	}
 
@@ -102,7 +107,7 @@ export class Canvas extends React.Component {
 	};
 
 	addAsset = (x, y, name) => {
-		const { assets, assetNextId } = this.state;
+		const { assets, assetNextId, dependencyTab } = this.state;
 		
 		const newAsset = {
 			id: `asset-${assetNextId}`,
@@ -111,11 +116,21 @@ export class Canvas extends React.Component {
 			type: name.toLowerCase(),
 			name: name
 		};
-	
+		
+		var newArr = dependencyTab;
+		if(assetNextId >= newArr.length) {
+			newArr.push({
+				input: "",
+				result: "",
+				depth: 1
+			});
+		};
+
 		this.setState({
 			assets: name.toLowerCase() === "vpc" ? [newAsset, ...assets] : [...assets, newAsset],
 			assetNextId: assetNextId + 1
 		});
+
 	};
 
 	deleteAsset = (id) => {
@@ -196,20 +211,30 @@ export class Canvas extends React.Component {
 		return intID;
 	}
 
-	changeTab = (event, newTab) => {
-		this.setState({ tabValue: newTab });
-	};
-
-	handleChange = (event, index) => {
+	changeTab = (event, index) => {
 		this.setState({ tabValue: index });
 	};
+
+	updateDependencyTab = (id, input, result, depth) => {
+		const { dependencyTab } = this.state;
+		var newArr = dependencyTab;
+		newArr[id].input = input;
+		newArr[id].result = result;
+		newArr[id].depth = depth;
+
+		if(JSON.stringify(newArr[id]) != JSON.stringify(dependencyTab[id])) {
+			this.setState({ dependencyTab: newArr });
+		}
+	}
 
 	renderTab = (value) => {
 		switch(value) {
 		case 0:
 			return (
 				<DependecyTab
-					id={ this.getIntID(currAssetID) }
+					id={this.getIntID(currAssetID)}
+					updateTab={this.updateDependencyTab}
+					data={this.state.dependencyTab[this.getIntID(currAssetID)]}
 				/>
 			);
 		case 1:
@@ -245,13 +270,12 @@ export class Canvas extends React.Component {
 						</Button>
 					</Grid>
 				</Grid>
-				<p>i cant design for shit</p>
 
 				<AppBar position="static">
 					<Tabs 
 						variant={"fullWidth"}
 						value={tabValue} 
-						onChange={this.handleChange} 
+						onChange={this.changeTab} 
 						aria-label="simple tabs example"
 					>
 						<Tab label="item 1" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>

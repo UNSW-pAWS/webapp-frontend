@@ -10,6 +10,7 @@ import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 
 var currID = 0;
+var prevID = -1;
 
 const styles = (theme) => ({
 	buttonLeft: {
@@ -28,13 +29,13 @@ export class DependecyTab extends React.Component {
 		this.state = {
 			input: "",
 			result: "",
-			depth: [1],
+			depth: 1,
 			disableSearch: false,
 		};
 	};
 
 	buttonCheck = () => {
-		const { input, depth, currID } = this.state;
+		const { input, depth } = this.state;
 
 		this.setState({ disableSearch: true });
 		this.setState({ result: "" });
@@ -49,7 +50,7 @@ export class DependecyTab extends React.Component {
 			const request = {
 				"package_manager_type" : "npm",
 				"package_list" : array,
-				"level" : depth[currID]
+				"level" : depth,
 			};
 	
 			axios.post("/threat/search", request, {
@@ -82,8 +83,8 @@ export class DependecyTab extends React.Component {
 		const { depth } = this.state;
 		var newDepth = depth;
 
-		if(depth[currID] < 4) {
-			newDepth[currID]++;
+		if(depth < 4) {
+			newDepth++;
 			this.setState({ depth: newDepth });
 		};
 	}
@@ -92,22 +93,27 @@ export class DependecyTab extends React.Component {
 		const { depth } = this.state;
 		var newDepth = depth;
 
-		if(depth[currID] > 1) {
-			newDepth[currID]--;
+		if(depth > 1) {
+			newDepth--;
 			this.setState({ depth: newDepth });
 		};
 	}
 
-	// adds extra entities to the state array
-	extendArray = (num, arr, contents) => {
-		var difference = num - arr.length;
-		var content = contents;
-		for(var i = 0; i <= difference; i++) {
-			arr.push(content);
-		}
+	componentDidUpdate() {
+		const { data, updateTab } = this.props;
+		const { input, result, depth } = this.state;
 
-		this.setState({ depth: arr })
-		return arr;
+		//load from parent
+		if(currID != prevID) {
+			this.setState({ input: data.input });
+			this.setState({ result: data.result });
+			this.setState({ depth: data.depth });
+			prevID = currID;
+		}
+		else {
+			updateTab(currID, input, result, depth);
+		}
+		
 	}
 
 	render() {
@@ -115,11 +121,6 @@ export class DependecyTab extends React.Component {
 		const { id } = this.props;
 
 		currID = id;
-		if(currID >= depth.length) {
-			this.extendArray(currID, depth, 1);
-		}
-
-		//repeat for input and result
 
 		return (
 			<div>
@@ -152,7 +153,7 @@ export class DependecyTab extends React.Component {
 							<RemoveIcon/>
 						</IconButton>
 						<TextField 
-							value={`Search depth: ${depth[currID]}`}
+							value={`Search depth: ${depth}`}
 							textAlign="center"
 							variant="outlined"
 						/>
