@@ -1,6 +1,6 @@
-# pAWS | Dependency Checker (Frontend)
+# pAWS | Application Configuration Tool
 
-Frontend application which allows users to enter their dependencies and view the results of their vulnerability scans.
+ReactJS application which allows users to quickly create their application's architecture diagram and specify their configuration. This tool put security at the forefront and also allows users to select what AWS Managed Rules they want to be guided by.
 
 <br />
 
