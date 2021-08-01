@@ -5,6 +5,7 @@ import axios from "axios";
 
 import { withStyles } from "@material-ui/core/styles";
 
+import Divider from "@material-ui/core/Divider";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
@@ -14,6 +15,19 @@ import TextField from "@material-ui/core/TextField";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import { objectTypeSpreadProperty } from "@babel/types";
+import { classes } from "istanbul-lib-coverage";
 
 const styles = (theme) => ({
 	buttonLeft: {
@@ -54,6 +68,17 @@ const styles = (theme) => ({
 	},
 	checkProgress: {
 		position: "absolute"
+	},
+	resultsGrid: {
+		height: "fit-content",
+		maxHeight: "15em",
+		overflowY: "scroll",
+		backgroundColor: "#DEDEDE",
+		padding: "0.5em 0",
+		borderRadius: "5px"
+	},
+	accordionBase: {
+		width: "100%"
 	}
 });
 
@@ -144,6 +169,59 @@ export class DependencyTab extends React.Component {
 		};
 	};
 
+	renderVulnerabilityResults = (data) => {
+		const { classes } = this.props;
+
+		return (
+			Object.keys(data).map((p) => {
+				return (
+					<div className={classes.accordionBase}>
+						<Accordion id={p}>
+							<AccordionSummary
+								expandIcon={<ExpandMoreIcon />}
+							>
+								<Typography>{p}</Typography>
+							</AccordionSummary>
+							<AccordionDetails>
+								<Grid container direction={"column"}>
+									<Grid container item>
+										<Typography>Vulnerabilities</Typography>
+										<TableContainer component={Paper}>
+											<Table>
+												<TableHead>
+													<TableRow>
+														<TableCell>CVE ID</TableCell>
+														<TableCell>Base Score</TableCell>
+														<TableCell>Base Severity</TableCell>
+													</TableRow>
+												</TableHead>
+												<TableBody>
+													{ data[p][1].map((v) => {
+														return (
+															<TableRow key={v.cve_id}>
+																<TableCell>{v.cve_id}</TableCell>
+																<TableCell>{v.base_score}</TableCell>
+																<TableCell>{v.base_severity}</TableCell>
+															</TableRow>
+														)
+													})}
+												</TableBody>
+											</Table>
+										</TableContainer>
+									</Grid>
+									<Grid container item>
+										<Typography>Dependencies</Typography>
+										{ this.renderVulnerabilityResults(data[p][0]) }
+									</Grid>
+								</Grid>
+							</AccordionDetails>
+						</Accordion>	
+					</div>
+				)
+			})
+		);
+	}
+
 	render() {
 		const { isSearching } = this.state;
 		const { classes, asset, onUpdate } = this.props;
@@ -206,17 +284,10 @@ export class DependencyTab extends React.Component {
 							</Button>
 					</Container>
 				</Grid>
-				<Grid container spacing={3}>
-					<Grid item xs={12}>
-						<TextField
-							fullWidth
-							variant="filled"
-							multiline
-							value={dependencyOptions.result ? JSON.stringify(dependencyOptions.result, null, 4): ""}
-							rows={10}
-							rowsMax={10}
-						/>
-					</Grid>
+				<Grid className={classes.resultsGrid} container item xs={12}>
+					<Container>
+						{ dependencyOptions.result && this.renderVulnerabilityResults(dependencyOptions.result) }
+					</Container>
 				</Grid>
 			</Grid>
 		);
