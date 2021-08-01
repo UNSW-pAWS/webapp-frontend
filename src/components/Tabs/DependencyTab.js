@@ -5,6 +5,7 @@ import axios from "axios";
 
 import { withStyles } from "@material-ui/core/styles";
 
+import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
@@ -12,6 +13,7 @@ import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const styles = (theme) => ({
 	buttonLeft: {
@@ -41,9 +43,17 @@ const styles = (theme) => ({
 		width: "fit-content",
 		borderRadius: "5px"
 	},
-	checkButton: {
-		marginLeft: "0.5em",
-		marginBottom: "1em"
+	checkButtonContainer: {
+		width: "fit-content",
+		marginBottom: "1em",
+		marginRight: 0,
+		padding: 0,
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center"
+	},
+	checkProgress: {
+		position: "absolute"
 	}
 });
 
@@ -53,20 +63,21 @@ export class DependencyTab extends React.Component {
 		super(props);
 
 		this.state = {
-			disableSearch: false,
+			isSearching: false,
 		};
 	};
 
 	buttonCheck = () => {
 		const { asset, onUpdate } = this.props
-		const { input, depth } = this.state;
 
-		this.setState({ disableSearch: true });
-		this.setState({ result: "" });
+		const depth = asset.dependencyOptions.depth; 
+		const input = asset.dependencyOptions.input; 
+
+		this.setState({ isSearching: true });
 
 		const regexp = new RegExp("[a-z]+(,\s*[a-z]+)*");
 
-		if(regexp.test(input)) {
+		if (regexp.test(input)) {
 			var array = input.trim().split(",").map(function(item) {
 				return item.trim();
 			});
@@ -75,21 +86,30 @@ export class DependencyTab extends React.Component {
 				"package_manager_type" : "npm",
 				"package_list" : array,
 				"level" : depth,
+				"severity": ["CRITICAL"],
+				"date": "None"
 			};
 	
-			axios.post("/threat/search", request, {
-				baseURL: "http://localhost:5000",
-				headers: {"Content-Type": "application/json"},
-				timeout: 120000
-			}).then(response => {
-				this.setState({ disableSearch: false }, () => {
-					onUpdate(asset.id, "result", JSON.stringify(response.data, null, 4));
+			axios
+				.post(
+					"/threat/search",
+					request, 
+					{ 
+						baseURL: "http://dependency.eba-5uazmhpj.ap-southeast-2.elasticbeanstalk.com"
+					}
+				).then(response => {
+					this.setState({ disableSearch: false }, () => {
+						onUpdate(asset.id, "result", response.data);
+					});
+				}).catch((error) => {
+					console.log(error);
+				}).finally(() => {
+					this.setState({ isSearching: false });
 				});
-			});
 		}
 		else {
 			this.setState({ result: "Input must be in the form PACKAGE1, PACKAGE2, PACKAGE3..."});
-			this.setState({ disableSearch: false });
+			this.setState({ isSearching: false });
 		};
 		
 	};
@@ -125,7 +145,7 @@ export class DependencyTab extends React.Component {
 	};
 
 	render() {
-		const { disableSearch } = this.state;
+		const { isSearching } = this.state;
 		const { classes, asset, onUpdate } = this.props;
 
 		const dependencyOptions = asset.dependencyOptions;
@@ -171,16 +191,20 @@ export class DependencyTab extends React.Component {
 						</IconButton>
 					</Grid>
 				</Grid>
-				<Grid container item xs={12} justify={"flex-end"}>
-					<Button
-						className={classes.checkButton}
-						color={"primary"}
-						variant={"contained"}
-						onClick={this.buttonCheck}
-						disabled={disableSearch}
-					>
-						{"Check Packages"}
-					</Button>
+				<Grid container item xs={12} alignItems={"center"}>
+					<Container className={classes.checkButtonContainer}>
+						{ isSearching && (
+							<CircularProgress className={classes.checkProgress} size={30}/>
+						)}
+							<Button
+								color={"primary"}
+								variant={"contained"}
+								onClick={this.buttonCheck}
+								disabled={isSearching}
+							>
+								{"Check Packages"}
+							</Button>
+					</Container>
 				</Grid>
 				<Grid container spacing={3}>
 					<Grid item xs={12}>
@@ -190,7 +214,7 @@ export class DependencyTab extends React.Component {
 							multiline
 							value={dependencyOptions.result ? JSON.stringify(dependencyOptions.result, null, 4): ""}
 							rows={10}
-							rowsMax={30}
+							rowsMax={10}
 						/>
 					</Grid>
 				</Grid>
