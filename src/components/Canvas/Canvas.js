@@ -55,6 +55,9 @@ const styles = (theme) => ({
 		textAlign: "left",
 		marginBottom: "0.25em",
 	},
+	tabBar: {
+		marginBottom: "1em"
+	},
 	tab: {
 		minWidth: "33%",
 		height: "20%",
@@ -63,12 +66,6 @@ const styles = (theme) => ({
 	activeTab: {
 		backgroundColor: "rgb(255, 153, 0, 0.3)",
 		borderRight: "4px solid #FF9900"
-	},
-	tabs: {
-		width: "100%",
-		"& .MuiTabs-flexContainerHorizontal": {
-			width: "10%"
-		}
 	}
 
 });
@@ -209,16 +206,19 @@ export class Canvas extends React.Component {
 
 	onDependencyUpdate = (assetId, field, value) => {
 		const { assets } = this.state;
-		console.log(assetId, field, value)
 
-		if (field !== "input" && field !== "result" && field !== "depth") {
+		if (field !== "input" && field !== "result" && field !== "depth" && field !== "all") {
 			return;
 		};
 
 		const assetsClone = _.cloneDeep(assets);
 		const updatedAssetIndex = assetsClone.findIndex((a) => a.id === assetId);
 		
-		assetsClone[updatedAssetIndex].dependencyOptions[field] = value;
+		if (field === "all") {
+			assetsClone[updatedAssetIndex].dependencyOptions = value;
+		} else {
+			assetsClone[updatedAssetIndex].dependencyOptions[field] = value;
+		}
 
 		this.setState({ assets: assetsClone });
 	};
@@ -232,7 +232,7 @@ export class Canvas extends React.Component {
 			case 0:
 				return (
 					<DependencyTab
-						updateTab={this.onDependencyUpdate}
+						onUpdate={this.onDependencyUpdate}
 						asset={currentAsset}
 					/>
 				)
@@ -264,7 +264,7 @@ export class Canvas extends React.Component {
 				<Typography className={classes.headingStyle} variant={"h5"}>
 					{currentDrawerAssetId}
 				</Typography>
-				<AppBar position="static">
+				<AppBar position="static" className={classes.tabBar}>
 					<Tabs 
 						variant={"fullWidth"}
 						value={tabValue} 
@@ -276,9 +276,7 @@ export class Canvas extends React.Component {
 						<Tab label="Dependency Checker" className={clsx(classes.tab, tabValue === 2 && classes.activeTab)} value={2}/>
 					</Tabs>
 				</AppBar>
-				<div>
-					{ this.renderTab(tabValue) }
-				</div>
+				{ this.renderTab(tabValue) }
 			</div>
 		);
 	};

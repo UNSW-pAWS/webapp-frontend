@@ -20,6 +20,31 @@ const styles = (theme) => ({
 	buttonRight: {
 		textAlign: "right"
 	},
+	inputGrid: {
+		position: "relative",
+		marginBottom: "0.5em"
+	},
+	clearButton: {
+		position: "absolute",
+		bottom: 0,
+		right: 0
+	},
+	depthText: {
+		marginRight: "0.5em"
+	},
+	depthNumber: {
+		fontWeight: "bold",
+		margin: "0 0.25em"
+	},
+	depthToggleGrid: {
+		border: "1px solid #AAAAAA",
+		width: "fit-content",
+		borderRadius: "5px"
+	},
+	checkButton: {
+		marginLeft: "0.5em",
+		marginBottom: "1em"
+	}
 });
 
 export class DependencyTab extends React.Component {
@@ -72,8 +97,11 @@ export class DependencyTab extends React.Component {
 	buttonClear = () => {
 		const { onUpdate, asset } = this.props;
 
-		onUpdate(asset.id, "input", "");
-		onUpdate(asset.id, "result", "")
+		onUpdate(asset.id, "all", {
+			input: "",
+			result: null,
+			depth: 1
+		});
 	};
 
 	incrementDepth = () => {
@@ -98,62 +126,61 @@ export class DependencyTab extends React.Component {
 
 	render() {
 		const { disableSearch } = this.state;
-		const { asset, onUpdate } = this.props;
+		const { classes, asset, onUpdate } = this.props;
 
 		const dependencyOptions = asset.dependencyOptions;
 
 		return (
-			<React.Fragment>
-				<Grid container spacing={3}>
-					<Grid item xs={12}>
-						<TextField
-							fullWidth
-							variant="outlined"
-							placeholder="Enter your package names"
-							value={dependencyOptions.input}
-							multiline
-							rows={5}
-							rowsMax={5}
-							onChange={(e) => { onUpdate(asset.id, "input", e.target.value)}}
-						/>
-					</Grid>
+			<Grid container direction={"column"}>
+				<Grid item xs={12} className={classes.inputGrid}>
+					<TextField
+						fullWidth
+						variant="outlined"
+						placeholder="Enter your package names"
+						value={dependencyOptions.input}
+						multiline
+						rows={5}
+						rowsMax={5}
+						onChange={(e) => { onUpdate(asset.id, "input", e.target.value)}}
+					/>
+					<Button
+						className={classes.clearButton}
+						color={"primary"}
+						onClick={this.buttonClear}
+					>
+						{"Clear"}
+					</Button>
 				</Grid>
-				<Grid container spacing={3}>
-					<Grid item xs={3}>
+				<Grid container item>
+					<Grid item>
+						<Typography variant={"h6"} className={classes.depthText}>Depth</Typography>
+					</Grid>
+					<Grid container item className={classes.depthToggleGrid}>
 						<IconButton 
 							onClick={this.incrementDepth}
 							size="small"
 						>
 							<AddIcon/>
 						</IconButton>
+						<Typography variant={"h6"} className={classes.depthNumber}>{dependencyOptions.depth}</Typography>
 						<IconButton 
 							onClick={this.decrementDepth}
 							size="small"
 						>
 							<RemoveIcon/>
 						</IconButton>
-						<Typography>{`Search depth: ${dependencyOptions.depth}`}</Typography>
 					</Grid>
-					
-					<Grid item xs={3}>
-						<Button 
-							size="medium"
-							variant="contained"
-							onClick={this.buttonCheck}
-							disabled={disableSearch}
-						>
-							{"Check Packages"}
-						</Button>
-					</Grid>
-					<Grid item xs={3}>
-						<Button 
-							size="medium"
-							variant="contained"
-							onClick={this.buttonClear}
-						>
-							{"Clear"}
-						</Button>
-					</Grid>
+				</Grid>
+				<Grid container item xs={12} justify={"flex-end"}>
+					<Button
+						className={classes.checkButton}
+						color={"primary"}
+						variant={"contained"}
+						onClick={this.buttonCheck}
+						disabled={disableSearch}
+					>
+						{"Check Packages"}
+					</Button>
 				</Grid>
 				<Grid container spacing={3}>
 					<Grid item xs={12}>
@@ -162,12 +189,12 @@ export class DependencyTab extends React.Component {
 							variant="filled"
 							multiline
 							value={dependencyOptions.result ? JSON.stringify(dependencyOptions.result, null, 4): ""}
-							rows={30}
+							rows={10}
 							rowsMax={30}
 						/>
 					</Grid>
 				</Grid>
-			</React.Fragment>
+			</Grid>
 		);
 	};
 };
