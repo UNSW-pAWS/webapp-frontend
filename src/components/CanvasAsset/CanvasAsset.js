@@ -9,7 +9,7 @@ import { Rnd } from "react-rnd";
 
 import { TopArrowHandler, RightArrowHandler, BottomArrowHandler, LeftArrowHandler } from "../ArrowHandlers";
 import { Tooltip, IconButton } from "@material-ui/core";
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 
 import { ec2 } from "../../icons/resources/ec2";
 import { lambda } from "../../icons/resources/lambda";

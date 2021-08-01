@@ -67,50 +67,50 @@ export class ConfigTab extends React.Component {
 
 	renderField = (field) => {
 		switch (field.type) {
-			case "free-text":
-				return (
-					<TextField
-						label={field.propertyId}
-						variant={"outlined"}
+		case "free-text":
+			return (
+				<TextField
+					label={field.propertyId}
+					variant={"outlined"}
+					value={field.value}
+				/>
+			);
+		case "dropdown":
+			return (
+				<FormControl>
+					<InputLabel>{field.propertyId}</InputLabel>
+					<Select
 						value={field.value}
-					/>
-				);
-			case "dropdown":
-				return (
-					<FormControl>
-						<InputLabel>{field.propertyId}</InputLabel>
-						<Select
-							value={field.value}
-						>
-							{ field.values.map((v) => {
-								return (
-									<MenuItem value={v}>{v}</MenuItem>
-								)
-							})}
-						</Select>
-					</FormControl>
-				);
-			case "integer":
-				return (
-					<TextField
-						label={field.propertyId}
-						variant={"outlined"}
-						value={field.value}
-					/>
-				);
-			case "json":
-				return (
-					<TextField
-						fullWidth
-						multiline
-						rows={3}
-						label={field.propertyId}
-						variant={"outlined"}
-						value={field.value}
-					/>
-				);
-			default:
-				return;
+					>
+						{ field.values.map((v) => {
+							return (
+								<MenuItem key={v} value={v}>{v}</MenuItem>
+							);
+						})}
+					</Select>
+				</FormControl>
+			);
+		case "integer":
+			return (
+				<TextField
+					label={field.propertyId}
+					variant={"outlined"}
+					value={field.value}
+				/>
+			);
+		case "json":
+			return (
+				<TextField
+					fullWidth
+					multiline
+					rows={3}
+					label={field.propertyId}
+					variant={"outlined"}
+					value={field.value}
+				/>
+			);
+		default:
+			return;
 		}
 	}
 
@@ -134,7 +134,7 @@ export class ConfigTab extends React.Component {
 										control={<Checkbox className={classes.checkbox} checked={r.selected} />}
 										label={r.ruleName}
 									/>
-								)
+								);
 							})}
 						</FormGroup>
 						<Divider />
@@ -156,16 +156,16 @@ export class ConfigTab extends React.Component {
 										<Grid container item xs={12}>
 											{ _.chunk(asset.configurationOptions.options[k].properties, 2).map((propPair) => {
 												return (
-													<Grid container item xs={12}>
+													<Grid key={`pair-${propPair[0].propertyId}`} container item xs={12}>
 														{ propPair.map((p) => {
 															return (
-																<Grid container item xs={6}>
+																<Grid key={p.propertyId} container item xs={6}>
 																	{this.renderField(p)}
 																</Grid>
-															)
+															);
 														})}
 													</Grid>
-												)
+												);
 											})}
 										</Grid>
 									</Paper>

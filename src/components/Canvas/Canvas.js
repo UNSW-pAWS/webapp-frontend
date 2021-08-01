@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import _, { get } from "lodash";
+import _ from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -9,10 +9,9 @@ import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
-import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from '@material-ui/icons/Close';
+import CloseIcon from "@material-ui/icons/Close";
 import InputBase from "@material-ui/core/TextField";
 
 import { Arrow } from "../Arrow";
@@ -34,9 +33,9 @@ const CONFIG_OPTIONS_MAP = {
 	"RDS": RDS_OPTIONS,
 	"S3": S3_OPTIONS,
 	"VPC": VPC_OPTIONS
-}
+};
 
-const styles = (theme) => ({
+const styles = () => ({
 	base: {
 		maxWidth: "100%",
 		height: "100%",
@@ -228,7 +227,7 @@ export class Canvas extends React.Component {
 
 		if (field !== "input" && field !== "result" && field !== "depth" && field !== "all") {
 			return;
-		};
+		}
 
 		const assetsClone = _.cloneDeep(assets);
 		const updatedAssetIndex = assetsClone.findIndex((a) => a.id === assetId);
@@ -248,21 +247,20 @@ export class Canvas extends React.Component {
 		const currentAsset = assets.find((a) => a.id === currentDrawerAssetId);
 
 		switch(value) {
-			case 0:
-				return (
-					<ConfigTab asset={currentAsset} />
-				)
+		case 0:
+			return (
+				<ConfigTab asset={currentAsset} />
+			);
 
-			case 1:
-				return (
-					<DependencyTab
-						asset={currentAsset}
-						onUpdate={this.onDependencyUpdate}
-					/>
-				)
-			default: {
-				return;
-			}
+		case 1:
+			return (
+				<DependencyTab
+					asset={currentAsset}
+					onUpdate={this.onDependencyUpdate}
+				/>
+			);
+		default:
+			return;
 		}
 	}
 

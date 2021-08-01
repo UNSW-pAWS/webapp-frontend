@@ -15,17 +15,17 @@ import TextField from "@material-ui/core/TextField";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Accordion from '@material-ui/core/Accordion';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import Accordion from "@material-ui/core/Accordion";
+import AccordionSummary from "@material-ui/core/AccordionSummary";
+import AccordionDetails from "@material-ui/core/AccordionDetails";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Paper from "@material-ui/core/Paper";
 
 const styles = (theme) => ({
 	buttonLeft: {
@@ -95,10 +95,10 @@ export class DependencyTab extends React.Component {
 		this.state = {
 			isSearching: false,
 		};
-	};
+	}
 
 	buttonCheck = () => {
-		const { asset, onUpdate } = this.props
+		const { asset, onUpdate } = this.props;
 
 		const depth = asset.dependencyOptions.depth; 
 		const input = asset.dependencyOptions.input; 
@@ -141,7 +141,7 @@ export class DependencyTab extends React.Component {
 		else {
 			this.setState({ result: "Input must be in the form PACKAGE1, PACKAGE2, PACKAGE3..."});
 			this.setState({ isSearching: false });
-		};
+		}
 		
 	};
 
@@ -161,8 +161,8 @@ export class DependencyTab extends React.Component {
 		const depth = asset.dependencyOptions.depth; 
 
 		if(depth < 4) {
-			onUpdate(asset.id, "depth", depth + 1)
-		};
+			onUpdate(asset.id, "depth", depth + 1);
+		}
 	};
 
 	decrementDepth = () => {
@@ -171,8 +171,8 @@ export class DependencyTab extends React.Component {
 		const depth = asset.dependencyOptions.depth; 
 
 		if(depth > 1) {
-			onUpdate(asset.id, "depth", depth - 1)
-		};
+			onUpdate(asset.id, "depth", depth - 1);
+		}
 	};
 
 	renderVulnerabilityResults = (data) => {
@@ -181,7 +181,7 @@ export class DependencyTab extends React.Component {
 		return (
 			Object.keys(data).map((p) => {
 				return (
-					<div className={classes.accordionBase}>
+					<div key={p} className={classes.accordionBase}>
 						<Accordion id={p}>
 							<AccordionSummary
 								expandIcon={<ExpandMoreIcon />}
@@ -210,7 +210,7 @@ export class DependencyTab extends React.Component {
 																	<TableCell>{v.base_score}</TableCell>
 																	<TableCell>{v.base_severity}</TableCell>
 																</TableRow>
-															)
+															);
 														})
 													) : (
 														<TableRow>
@@ -230,7 +230,7 @@ export class DependencyTab extends React.Component {
 							</AccordionDetails>
 						</Accordion>	
 					</div>
-				)
+				);
 			})
 		);
 	}
@@ -252,7 +252,7 @@ export class DependencyTab extends React.Component {
 						multiline
 						rows={5}
 						rowsMax={5}
-						onChange={(e) => { onUpdate(asset.id, "input", e.target.value)}}
+						onChange={(e) => onUpdate(asset.id, "input", e.target.value)}
 					/>
 					<Button
 						className={classes.clearButton}
@@ -287,14 +287,14 @@ export class DependencyTab extends React.Component {
 						{ isSearching && (
 							<CircularProgress className={classes.checkProgress} size={30}/>
 						)}
-							<Button
-								color={"primary"}
-								variant={"contained"}
-								onClick={this.buttonCheck}
-								disabled={isSearching}
-							>
-								{"Check Packages"}
-							</Button>
+						<Button
+							color={"primary"}
+							variant={"contained"}
+							onClick={this.buttonCheck}
+							disabled={isSearching}
+						>
+							{"Check Packages"}
+						</Button>
 					</Container>
 				</Grid>
 				{ dependencyOptions.result && (
@@ -306,8 +306,8 @@ export class DependencyTab extends React.Component {
 				)}
 			</Grid>
 		);
-	};
-};
+	}
+}
 
 DependencyTab.propTypes = {
 	classes: PropTypes.object.isRequired,
