@@ -89,7 +89,7 @@ export class ConfigTab extends React.Component {
 					</Grid>
 					<Grid item>
 						<FormGroup>
-							{ asset.options.rules.map((r) => {
+							{ asset.configurationOptions.rules.map((r) => {
 								return (
 									<FormControlLabel
 										key={`${asset.id}-${r.ruleName}`}
@@ -103,14 +103,14 @@ export class ConfigTab extends React.Component {
 					</Grid>
 				</Grid>
 				<Grid container item xs={12} direction={"column"}>
-					{ Object.keys(asset.options.options).map((k) => {
+					{ Object.keys(asset.configurationOptions.options).map((k) => {
 						return (
 							<Grid container key={k}>
 								<Grid item>
 									<Typography>{k}</Typography>
 								</Grid>
 								<Grid>
-									{ asset.options.options[k].properties.map((p) => {
+									{ asset.configurationOptions.options[k].properties.map((p) => {
 										return this.renderField(p);
 									})}
 								</Grid>

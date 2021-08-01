@@ -5,12 +5,13 @@ import axios from "axios";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import { Button, IconButton, Grid, TextField } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import Grid from "@material-ui/core/Grid";
+import TextField from "@material-ui/core/TextField";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
-
-var currID = 0;
-var prevID = -1;
 
 const styles = (theme) => ({
 	buttonLeft: {
@@ -21,20 +22,18 @@ const styles = (theme) => ({
 	},
 });
 
-export class DependecyTab extends React.Component {
+export class DependencyTab extends React.Component {
 
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			input: "",
-			result: "",
-			depth: 1,
 			disableSearch: false,
 		};
 	};
 
 	buttonCheck = () => {
+		const { asset, onUpdate } = this.props
 		const { input, depth } = this.state;
 
 		this.setState({ disableSearch: true });
@@ -58,8 +57,9 @@ export class DependecyTab extends React.Component {
 				headers: {"Content-Type": "application/json"},
 				timeout: 120000
 			}).then(response => {
-				this.setState({ result: JSON.stringify(response.data, null, 4) });
-				this.setState({ disableSearch: false });
+				this.setState({ disableSearch: false }, () => {
+					onUpdate(asset.id, "result", JSON.stringify(response.data, null, 4));
+				});
 			});
 		}
 		else {
@@ -70,78 +70,51 @@ export class DependecyTab extends React.Component {
 	};
 
 	buttonClear = () => {
-		this.setState({ input: "" });
-		this.setState({ result: "" });
-	};
+		const { onUpdate, asset } = this.props;
 
-	updateValue = (e) => {
-		var newStr = e.target.value;
-		this.setState({ input: newStr });
+		onUpdate(asset.id, "input", "");
+		onUpdate(asset.id, "result", "")
 	};
 
 	incrementDepth = () => {
-		const { depth } = this.state;
-		var newDepth = depth;
+		const { asset, onUpdate } = this.props;
+
+		const depth = asset.dependencyOptions.depth; 
 
 		if(depth < 4) {
-			newDepth++;
-			this.setState({ depth: newDepth });
+			onUpdate(asset.id, "depth", depth + 1)
 		};
 	};
 
 	decrementDepth = () => {
-		const { depth } = this.state;
-		var newDepth = depth;
+		const { asset, onUpdate } = this.props;
+		
+		const depth = asset.dependencyOptions.depth; 
 
 		if(depth > 1) {
-			newDepth--;
-			this.setState({ depth: newDepth });
+			onUpdate(asset.id, "depth", depth - 1)
 		};
 	};
 
-	componentDidUpdate() {
-		const { data, updateTab } = this.props;
-		const { input, result, depth } = this.state;
-
-		if(currID != prevID) {
-			this.setState({ input: data.input });
-			this.setState({ result: data.result });
-			this.setState({ depth: data.depth });
-			prevID = currID;
-		}
-		else {
-			updateTab(currID, input, result, depth);
-		};	
-	};
-
-	componentDidMount() {
-		// load data immediately on load or else update will overrite
-		const { data } = this.props;
-		this.setState({ input: data.input });
-		this.setState({ result: data.result });
-		this.setState({ depth: data.depth });
-		prevID = currID;
-	}
-
 	render() {
-		const { input, result, disableSearch, depth } = this.state;
-		const { id } = this.props;
+		const { disableSearch } = this.state;
+		const { asset, onUpdate } = this.props;
 
-		currID = id;
+		const dependencyOptions = asset.dependencyOptions;
 
 		return (
-			<div>
+			<React.Fragment>
 				<Grid container spacing={3}>
 					<Grid item xs={12}>
 						<TextField
 							fullWidth
 							variant="outlined"
 							placeholder="Enter your package names"
-							value={input}
+							value={dependencyOptions.input}
 							multiline
 							rows={5}
 							rowsMax={5}
-							onChange={this.updateValue}
+							onChange={(e) => { onUpdate(asset.id, "input", e.target.value)}}
 						/>
 					</Grid>
 				</Grid>
@@ -159,11 +132,7 @@ export class DependecyTab extends React.Component {
 						>
 							<RemoveIcon/>
 						</IconButton>
-						<TextField 
-							value={`Search depth: ${depth}`}
-							textAlign="center"
-							variant="outlined"
-						/>
+						<Typography>{`Search depth: ${dependencyOptions.depth}`}</Typography>
 					</Grid>
 					
 					<Grid item xs={3}>
@@ -192,20 +161,21 @@ export class DependecyTab extends React.Component {
 							fullWidth
 							variant="filled"
 							multiline
-							value={result}
+							value={dependencyOptions.result ? JSON.stringify(dependencyOptions.result, null, 4): ""}
 							rows={30}
 							rowsMax={30}
 						/>
 					</Grid>
 				</Grid>
-			</div>
+			</React.Fragment>
 		);
 	};
 };
 
-DependecyTab.propTypes = {
+DependencyTab.propTypes = {
 	classes: PropTypes.object.isRequired,
-	toggleDragging: PropTypes.func.isRequired
+	onUpdate: PropTypes.func.isRequired,
+	asset: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(DependecyTab);
+export default withStyles(styles)(DependencyTab);

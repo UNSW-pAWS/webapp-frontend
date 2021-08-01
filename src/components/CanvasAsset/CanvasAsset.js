@@ -148,7 +148,7 @@ export class CanvasAsset extends React.Component {
 	};
 
 	render() {
-		const { classes, id, metadata, isArrowBeingDrawn, selectedItem, toggleArrowDrawn, setDrawerButton } = this.props;
+		const { classes, id, metadata, isArrowBeingDrawn, selectedItem, toggleArrowDrawn, setDrawerState } = this.props;
 		const { hovered, arrowHovered, offset, size } = this.state;
 
 		const ResourceIcon = ICONS[metadata.type];
@@ -240,7 +240,7 @@ export class CanvasAsset extends React.Component {
 							<Tooltip title="Open menu">
 								<IconButton 
 									size="small" 
-									onClick={() => setDrawerButton(this.props.id)}
+									onClick={() => setDrawerState(id, true)}
 								>
 									<ArrowDropDownIcon fontSize="inherit"/>
 								</IconButton>
@@ -266,7 +266,8 @@ CanvasAsset.propTypes = {
 	isArrowBeingDrawn: PropTypes.bool.isRequired,
 	deleteAsset: PropTypes.func.isRequired,
 	addArrow: PropTypes.func.isRequired,
-	toggleAssetBeingDragged: PropTypes.func.isRequired
+	toggleAssetBeingDragged: PropTypes.func.isRequired,
+	setDrawerState: PropTypes.func.isRequired
 };
 
 CanvasAsset.defaultProps = {
