@@ -2,6 +2,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
+import _ from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -26,8 +27,6 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { objectTypeSpreadProperty } from "@babel/types";
-import { classes } from "istanbul-lib-coverage";
 
 const styles = (theme) => ({
 	buttonLeft: {
@@ -71,14 +70,21 @@ const styles = (theme) => ({
 	},
 	resultsGrid: {
 		height: "fit-content",
-		maxHeight: "15em",
+		maxHeight: "calc(100vh - 23em)",
 		overflowY: "scroll",
 		backgroundColor: "#DEDEDE",
 		padding: "0.5em 0",
 		borderRadius: "5px"
 	},
 	accordionBase: {
-		width: "100%"
+		width: "100%",
+		marginBottom: "0.5em"
+	},
+	accordianSubtitle: {
+		margin: "0 auto 0.25em auto"
+	},
+	vulnTable: {
+		marginBottom: "1em"
 	}
 });
 
@@ -99,6 +105,7 @@ export class DependencyTab extends React.Component {
 		const input = asset.dependencyOptions.input; 
 
 		this.setState({ isSearching: true });
+		onUpdate(asset.id, "result", null);
 
 		const regexp = new RegExp("[a-z]+(,\s*[a-z]+)*");
 
@@ -185,8 +192,8 @@ export class DependencyTab extends React.Component {
 							<AccordionDetails>
 								<Grid container direction={"column"}>
 									<Grid container item>
-										<Typography>Vulnerabilities</Typography>
-										<TableContainer component={Paper}>
+										<Typography className={classes.accordianSubtitle}>Vulnerabilities</Typography>
+										<TableContainer className={classes.vulnTable} component={Paper}>
 											<Table>
 												<TableHead>
 													<TableRow>
@@ -196,21 +203,28 @@ export class DependencyTab extends React.Component {
 													</TableRow>
 												</TableHead>
 												<TableBody>
-													{ data[p][1].map((v) => {
-														return (
-															<TableRow key={v.cve_id}>
-																<TableCell>{v.cve_id}</TableCell>
-																<TableCell>{v.base_score}</TableCell>
-																<TableCell>{v.base_severity}</TableCell>
-															</TableRow>
-														)
-													})}
+													{ data[p][1].length > 0 ? (
+														data[p][1].map((v) => {
+															return (
+																<TableRow key={v.cve_id}>
+																	<TableCell>{v.cve_id}</TableCell>
+																	<TableCell>{v.base_score}</TableCell>
+																	<TableCell>{v.base_severity}</TableCell>
+																</TableRow>
+															)
+														})
+													) : (
+														<TableRow>
+															<TableCell colSpan={3}>No vulnerabilities found</TableCell>
+														</TableRow>
+													)}
+													
 												</TableBody>
 											</Table>
 										</TableContainer>
 									</Grid>
 									<Grid container item>
-										<Typography>Dependencies</Typography>
+										{ !_.isEmpty(data[p][0]) && <Typography className={classes.accordianSubtitle}>Dependencies</Typography> }
 										{ this.renderVulnerabilityResults(data[p][0]) }
 									</Grid>
 								</Grid>
@@ -230,7 +244,7 @@ export class DependencyTab extends React.Component {
 
 		return (
 			<Grid container direction={"column"}>
-				<Grid item xs={12} className={classes.inputGrid}>
+				<Grid item className={classes.inputGrid}>
 					<TextField
 						fullWidth
 						variant="outlined"
@@ -269,7 +283,7 @@ export class DependencyTab extends React.Component {
 						</IconButton>
 					</Grid>
 				</Grid>
-				<Grid container item xs={12} alignItems={"center"}>
+				<Grid container item alignItems={"center"}>
 					<Container className={classes.checkButtonContainer}>
 						{ isSearching && (
 							<CircularProgress className={classes.checkProgress} size={30}/>
@@ -284,11 +298,13 @@ export class DependencyTab extends React.Component {
 							</Button>
 					</Container>
 				</Grid>
-				<Grid className={classes.resultsGrid} container item xs={12}>
-					<Container>
-						{ dependencyOptions.result && this.renderVulnerabilityResults(dependencyOptions.result) }
-					</Container>
-				</Grid>
+				{ dependencyOptions.result && (
+					<Grid className={classes.resultsGrid} container item>
+						<Container>
+							{ this.renderVulnerabilityResults(dependencyOptions.result) }
+						</Container>
+					</Grid>
+				)}
 			</Grid>
 		);
 	};

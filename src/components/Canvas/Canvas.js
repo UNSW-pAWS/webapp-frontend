@@ -11,7 +11,8 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from '@material-ui/icons/Close';
 
 import { Arrow } from "../Arrow";
 import { CanvasAsset } from "../CanvasAsset";
@@ -231,18 +232,10 @@ export class Canvas extends React.Component {
 		switch(value) {
 			case 0:
 				return (
-					<DependencyTab
-						onUpdate={this.onDependencyUpdate}
-						asset={currentAsset}
-					/>
-				)
-
-			case 1:
-				return (
 					<ConfigTab asset={currentAsset} />
 				)
 
-			case 2:
+			case 1:
 				return (
 					<DependencyTab
 						asset={currentAsset}
@@ -260,24 +253,39 @@ export class Canvas extends React.Component {
 		const { tabValue, currentDrawerAssetId } = this.state;
 
 		return (
-			<div className={classes.drawerStyle}>
-				<Typography className={classes.headingStyle} variant={"h5"}>
-					{currentDrawerAssetId}
-				</Typography>
-				<AppBar position="static" className={classes.tabBar}>
-					<Tabs 
-						variant={"fullWidth"}
-						value={tabValue} 
-						onChange={this.changeTab} 
-						aria-label="simple tabs example"
-					>
-						<Tab label="General" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>
-						<Tab label="Configuration" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
-						<Tab label="Dependency Checker" className={clsx(classes.tab, tabValue === 2 && classes.activeTab)} value={2}/>
-					</Tabs>
-				</AppBar>
-				{ this.renderTab(tabValue) }
-			</div>
+			<Grid className={classes.drawerStyle} container direction={"column"}>
+				<Grid container item>
+					<Grid item xs={11}>
+						<Typography className={classes.headingStyle} variant={"h5"}>
+							{currentDrawerAssetId}
+						</Typography>
+					</Grid>
+					<Grid item xs={1}>
+						<IconButton
+							size={"small"}
+							onClick={() => this.setDrawerState(null, false)}
+						>
+							<CloseIcon />
+						</IconButton>
+					</Grid>
+				</Grid>
+				<Grid container item>
+					<AppBar position="static" className={classes.tabBar}>
+						<Tabs 
+							variant={"fullWidth"}
+							value={tabValue} 
+							onChange={this.changeTab} 
+							aria-label="simple tabs example"
+						>
+							<Tab label="Configuration" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>
+							<Tab label="Dependency Checker" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
+						</Tabs>
+					</AppBar>
+				</Grid>
+				<Grid container item>
+					{ this.renderTab(tabValue) }
+				</Grid>
+			</Grid>
 		);
 	};
 
