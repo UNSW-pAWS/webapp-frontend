@@ -110,7 +110,6 @@ export class Canvas extends React.Component {
 	onDragLeave = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
-		this.setDrawer(false);
 	};
 
 	onDrop = (e) => {
@@ -250,14 +249,16 @@ export class Canvas extends React.Component {
 
 	DrawerContents = () => {
 		const { classes } = this.props;
-		const { tabValue, currentDrawerAssetId } = this.state;
+		const { tabValue, assets, currentDrawerAssetId } = this.state;
+
+		const currentAsset = assets.find((a) => a.id === currentDrawerAssetId);
 
 		return (
 			<Grid className={classes.drawerStyle} container direction={"column"}>
 				<Grid container item>
 					<Grid item xs={11}>
 						<Typography className={classes.headingStyle} variant={"h5"}>
-							{currentDrawerAssetId}
+							{currentAsset.name}
 						</Typography>
 					</Grid>
 					<Grid item xs={1}>
@@ -306,7 +307,6 @@ export class Canvas extends React.Component {
 				{ menuOpen && (
 					<Drawer 
 						anchor="right"
-						variant="persistent"
 						open={menuOpen}
 						onClose={() => this.setDrawerState(null, false)}
 						className={classes.drawerStyle}

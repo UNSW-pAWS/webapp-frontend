@@ -1,6 +1,7 @@
 /* eslint-disable linebreak-style */
 import React from "react";
 import PropTypes from "prop-types";
+import _ from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -14,11 +15,48 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
+import Paper from "@material-ui/core/Paper";
 
 const styles = (theme) => ({
+	baseGrid: {
+		border: "1px solid #BBBBBB",
+		boxSizing: "border-box",
+		padding: "0.75em",
+		borderRadius: "5px"
+	},
 	buttonStyle: {
 		textAlign: "left"
 	},
+	checkbox: {
+		padding: "5px"
+	},
+	title: {
+		width: "100%",
+		textAlign: "left",
+		fontWeight: "bold"
+	},
+	subtitle: {
+		color: "#AAAAAA"
+	},
+	managedRulesGrid: {
+		padding: "0 0.5em"
+	},
+	managedRulesForm: {
+		marginBottom: "1em"
+	},
+	configurationGrid: {
+		paddingTop: "0.5em"
+	},
+	resourceGrid: {
+		margin: "0.5em 0"
+	},
+	resourcePaper: {
+		padding: "1em",
+		width: "100%"
+	},
+	resourceHeaderGrid: {
+		marginBottom: "1em"
+	}
 });
 
 export class ConfigTab extends React.Component {
@@ -63,6 +101,7 @@ export class ConfigTab extends React.Component {
 			case "json":
 				return (
 					<TextField
+						fullWidth
 						multiline
 						rows={3}
 						label={field.propertyId}
@@ -79,21 +118,20 @@ export class ConfigTab extends React.Component {
 	render() {
 		const { classes, asset } = this.props;
 
-		console.log(asset)
-
 		return (
-			<Grid container>
+			<Grid className={classes.baseGrid} container>
 				<Grid container item xs={12} direction={"column"}>
-					<Grid item>
-						<Typography>Select which AWS Managed Rules to include in your conformance pack:</Typography>
+					<Grid container item justify={"flex-start"}>
+						<Typography className={classes.title}>AWS Managed Rules</Typography>
+						<Typography className={classes.subtitle}>Please select which rules you would like to include</Typography>
 					</Grid>
-					<Grid item>
-						<FormGroup>
+					<Grid className={classes.managedRulesGrid} item>
+						<FormGroup className={classes.managedRulesForm}>
 							{ asset.configurationOptions.rules.map((r) => {
 								return (
 									<FormControlLabel
 										key={`${asset.id}-${r.ruleName}`}
-										control={<Checkbox checked={r.selected} />}
+										control={<Checkbox className={classes.checkbox} checked={r.selected} />}
 										label={r.ruleName}
 									/>
 								)
@@ -102,21 +140,39 @@ export class ConfigTab extends React.Component {
 						<Divider />
 					</Grid>
 				</Grid>
-				<Grid container item xs={12} direction={"column"}>
-					{ Object.keys(asset.configurationOptions.options).map((k) => {
-						return (
-							<Grid container key={k}>
-								<Grid item>
-									<Typography>{k}</Typography>
+				<Grid className={classes.configurationGrid} container item xs={12}>
+					<Grid container item xs={12} justify={"flex-start"}>
+						<Typography className={classes.title}>Configuration</Typography>
+						<Typography className={classes.subtitle}>Please select the configuration for each resource</Typography>
+					</Grid>
+					<Grid container item xs={12}>
+						{ Object.keys(asset.configurationOptions.options).map((k) => {
+							return (
+								<Grid className={classes.resourceGrid} container item xs={12} key={k}>
+									<Paper className={classes.resourcePaper}>
+										<Grid className={classes.resourceHeaderGrid} item xs={12}>
+											<Typography>{k}</Typography>
+										</Grid>
+										<Grid container item xs={12}>
+											{ _.chunk(asset.configurationOptions.options[k].properties, 2).map((propPair) => {
+												return (
+													<Grid container item xs={12}>
+														{ propPair.map((p) => {
+															return (
+																<Grid container item xs={6}>
+																	{this.renderField(p)}
+																</Grid>
+															)
+														})}
+													</Grid>
+												)
+											})}
+										</Grid>
+									</Paper>
 								</Grid>
-								<Grid>
-									{ asset.configurationOptions.options[k].properties.map((p) => {
-										return this.renderField(p);
-									})}
-								</Grid>
-							</Grid>
-						);
-					})}
+							);
+						})}
+					</Grid>
 				</Grid>
 			</Grid>
 		);
