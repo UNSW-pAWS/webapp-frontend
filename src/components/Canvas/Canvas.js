@@ -13,6 +13,7 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from '@material-ui/icons/Close';
+import InputBase from "@material-ui/core/TextField";
 
 import { Arrow } from "../Arrow";
 import { CanvasAsset } from "../CanvasAsset";
@@ -67,8 +68,14 @@ const styles = (theme) => ({
 	activeTab: {
 		backgroundColor: "rgb(255, 153, 0, 0.3)",
 		borderRight: "4px solid #FF9900"
+	},
+	nameField: {
+		marginBottom: "0.5em"
+	},
+	nameInput: {
+		padding: "10px",
+		fontSize: "24px"
 	}
-
 });
 
 export class Canvas extends React.Component {
@@ -193,6 +200,7 @@ export class Canvas extends React.Component {
 
 	setDrawerState = (assetId, state) => {
 		this.setState({
+			tabValue: 0,
 			currentDrawerAssetId: assetId,
 			menuOpen: state
 		}, () => {
@@ -201,7 +209,18 @@ export class Canvas extends React.Component {
 	};
 
 	changeTab = (_, index) => {
-		this.setState({ tabValue: index });
+		this.setState({	tabValue: index });
+	};
+
+	onAssetNameUpdate = (assetId, value) => {
+		const { assets } = this.state;
+
+		const assetsClone = _.cloneDeep(assets);
+		const updatedAssetIndex = assetsClone.findIndex((a) => a.id === assetId);
+
+		assetsClone[updatedAssetIndex].name = value;
+
+		this.setState({ assets: assetsClone });
 	};
 
 	onDependencyUpdate = (assetId, field, value) => {
@@ -257,9 +276,15 @@ export class Canvas extends React.Component {
 			<Grid className={classes.drawerStyle} container direction={"column"}>
 				<Grid container item>
 					<Grid item xs={11}>
-						<Typography className={classes.headingStyle} variant={"h5"}>
-							{currentAsset.name}
-						</Typography>
+						<InputBase
+							className={classes.nameField}
+							variant={"outlined"}
+							value={currentAsset.name}
+							inputProps={{
+								className: classes.nameInput
+							}}
+							onChange={(e) => this.onAssetNameUpdate(currentDrawerAssetId, e.target.value)}
+						/>
 					</Grid>
 					<Grid item xs={1}>
 						<IconButton
