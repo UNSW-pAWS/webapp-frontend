@@ -5,6 +5,9 @@ import clsx from "clsx";
 import { withStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
+import Tooltip from "@material-ui/core/Tooltip";
+import IconButton from "@material-ui/core/IconButton";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import { Rnd } from "react-rnd";
 
 import { vpc } from "../../icons/resources/vpc";
@@ -18,8 +21,8 @@ const styles = () => ({
 		boxSizing: "border-box"
 	},
 	asset: {
-		height: "70px",
-		width: "70px",
+		height: "90px",
+		width: "90px",
 		position: "absolute",
 		top: 0,
 		display: "flex",
@@ -89,7 +92,7 @@ export class VPCAsset extends React.Component {
 	};
 
 	render() {
-		const { classes, id, metadata, selectedItem } = this.props;
+		const { classes, id, metadata, selectedItem, setDrawerState } = this.props;
 
 		const ResourceIcon = vpc;
 
@@ -99,8 +102,8 @@ export class VPCAsset extends React.Component {
 					default={{
 						x: metadata.x - 30,
 						y: metadata.y - 30,
-						height: 120,
-						width: 120
+						height: 150,
+						width: 150
 					}}
 					bounds={"parent"}
 					enableResizing={{
@@ -124,6 +127,14 @@ export class VPCAsset extends React.Component {
 						className={clsx(classes.asset, selectedItem === id && classes.assetSelected)}
 						onClick={this.handleSelect}
 					>
+						<Tooltip title="Open menu">
+							<IconButton 
+								size="small" 
+								onClick={() => setDrawerState(id, true)}
+							>
+								<ArrowDropDownIcon fontSize="inherit"/>
+							</IconButton>
+						</Tooltip>
 						<ResourceIcon />
 						<Typography>{metadata.name}</Typography>
 					</Paper>
@@ -141,7 +152,8 @@ VPCAsset.propTypes = {
 	selectedItem: PropTypes.string,
 	setSelectedItem: PropTypes.func.isRequired,
 	deleteAsset: PropTypes.func.isRequired,
-	toggleAssetBeingDragged: PropTypes.func.isRequired
+	toggleAssetBeingDragged: PropTypes.func.isRequired,
+	setDrawerState: PropTypes.func.isRequired
 };
 
 VPCAsset.defaultProps = {

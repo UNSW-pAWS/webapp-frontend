@@ -2,6 +2,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
+import axios from "axios";
 
 import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -16,8 +17,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
+import Button from "@material-ui/core/Button";
 
 const styles = (theme) => ({
 	baseGrid: {
@@ -61,6 +61,9 @@ const styles = (theme) => ({
 	},
 	resourceOptionsRow: {
 		margin: "0.5em 0"
+	},
+	submitButtonGrid: {
+		margin: "1em 0.5em 0.5em 0.5em"
 	}
 });
 
@@ -85,9 +88,11 @@ export class ConfigTab extends React.Component {
 			);
 		case "dropdown":
 			return (
-				<FormControl>
-					<InputLabel>{field.propertyId}</InputLabel>
+				<FormControl variant={"outlined"}>
+					<InputLabel id={`${field.propertyId}-label`}>{field.propertyId}</InputLabel>
 					<Select
+						labelId={`${field.propertyId}-label`}
+						label={field.propertyId}
 						value={field.value}
 						onChange={(e) => onConfigUpdate(asset.id, resource, field.propertyId, e.target.value)}
 					>
@@ -139,6 +144,21 @@ export class ConfigTab extends React.Component {
 		}
 	}
 
+	handleSubmit = () => {
+		const { asset } = this.props;
+
+		const url = "http://localhost:5000/";
+		const payload = asset.configurationOptions;
+
+		axios
+			.post(url, payload)
+			.then((response) => {
+				console.log(response.data);
+			})
+			.catch((error) => {
+				console.log(error.data);
+			});
+	}
 
 	render() {
 		const { classes, asset, onRuleUpdate } = this.props;
@@ -183,16 +203,8 @@ export class ConfigTab extends React.Component {
 								<Grid className={classes.resourceGrid} container item xs={12} key={k}>
 									<Paper className={classes.resourcePaper}>
 										<Grid className={classes.resourceHeaderGrid} container item xs={12}>
-											<Grid item xs={10}>
+											<Grid item xs={12}>
 												<Typography>{k}</Typography>
-											</Grid>
-											<Grid container item xs={2} justify={"flex-end"}>
-												<IconButton
-													size={"small"}
-													disabled={asset.configurationOptions.options[k].required}
-												>
-													<CloseIcon />
-												</IconButton>
 											</Grid>
 										</Grid>
 										<Grid container item xs={12}>
@@ -214,6 +226,17 @@ export class ConfigTab extends React.Component {
 								</Grid>
 							);
 						})}
+					</Grid>
+					<Grid container item xs={12} justify={"flex-end"}>
+						<Button
+							className={classes.submitButtonGrid}
+							variant={"contained"}
+							color={"primary"}
+							onClick={this.handleSubmit}
+						>
+							Submit
+						</Button>
+
 					</Grid>
 				</Grid>
 			</Grid>

@@ -383,6 +383,7 @@ export class Canvas extends React.Component {
 									selectedItem={selectedItem}
 									setSelectedItem={this.setSelectedItem}
 									deleteAsset={this.deleteAsset}
+									setDrawerState={this.setDrawerState}
 									toggleAssetBeingDragged={() => {
 										this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
 									}}

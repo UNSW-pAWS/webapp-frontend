@@ -5,12 +5,12 @@ import clsx from "clsx";
 import { withStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
+import Tooltip from "@material-ui/core/Tooltip";
+import IconButton from "@material-ui/core/IconButton";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import { Rnd } from "react-rnd";
 
 import { TopArrowHandler, RightArrowHandler, BottomArrowHandler, LeftArrowHandler } from "../ArrowHandlers";
-import { Tooltip, IconButton } from "@material-ui/core";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-
 import { ec2 } from "../../icons/resources/ec2";
 import { lambda } from "../../icons/resources/lambda";
 import { rds } from "../../icons/resources/rds";
