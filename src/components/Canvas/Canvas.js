@@ -241,6 +241,36 @@ export class Canvas extends React.Component {
 		this.setState({ assets: assetsClone });
 	};
 
+	onConfigurationUpdate = (assetId, resource, property, value) => {
+		const { assets } = this.state;
+
+		const assetsClone = _.cloneDeep(assets);
+		const updatedAssetIndex = assetsClone.findIndex((a) => a.id === assetId);
+
+		assetsClone[updatedAssetIndex].configurationOptions.options[resource].properties.forEach(p => {
+			if (p.propertyId === property) {
+				p.value = value;
+			}
+		});
+
+		this.setState({ assets: assetsClone });
+	};
+
+	onRuleUpdate = (assetId, ruleName, value) => {
+		const { assets } = this.state;
+
+		const assetsClone = _.cloneDeep(assets);
+		const updatedAssetIndex = assetsClone.findIndex((a) => a.id === assetId);
+
+		assetsClone[updatedAssetIndex].configurationOptions.rules.forEach((r) => {
+			if (r.ruleName === ruleName) {
+				r.selected = value;
+			}
+		});
+
+		this.setState({ assets: assetsClone });
+	}
+
 	renderTab = (value) => {
 		const { currentDrawerAssetId, assets } = this.state;
 
@@ -249,7 +279,11 @@ export class Canvas extends React.Component {
 		switch(value) {
 		case 0:
 			return (
-				<ConfigTab asset={currentAsset} />
+				<ConfigTab
+					asset={currentAsset}
+					onConfigUpdate={this.onConfigurationUpdate}
+					onRuleUpdate={this.onRuleUpdate}
+				/>
 			);
 
 		case 1:

@@ -16,6 +16,8 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
 
 const styles = (theme) => ({
 	baseGrid: {
@@ -56,6 +58,9 @@ const styles = (theme) => ({
 	},
 	resourceHeaderGrid: {
 		marginBottom: "1em"
+	},
+	resourceOptionsRow: {
+		margin: "0.5em 0"
 	}
 });
 
@@ -65,7 +70,9 @@ export class ConfigTab extends React.Component {
 		super(props);
 	}
 
-	renderField = (field) => {
+	renderField = (resource, field) => {
+		const { classes, asset, onConfigUpdate } = this.props;
+
 		switch (field.type) {
 		case "free-text":
 			return (
@@ -73,6 +80,7 @@ export class ConfigTab extends React.Component {
 					label={field.propertyId}
 					variant={"outlined"}
 					value={field.value}
+					onChange={(e) => onConfigUpdate(asset.id, resource, field.propertyId, e.target.value)}
 				/>
 			);
 		case "dropdown":
@@ -81,6 +89,7 @@ export class ConfigTab extends React.Component {
 					<InputLabel>{field.propertyId}</InputLabel>
 					<Select
 						value={field.value}
+						onChange={(e) => onConfigUpdate(asset.id, resource, field.propertyId, e.target.value)}
 					>
 						{ field.values.map((v) => {
 							return (
@@ -96,6 +105,7 @@ export class ConfigTab extends React.Component {
 					label={field.propertyId}
 					variant={"outlined"}
 					value={field.value}
+					onChange={(e) => onConfigUpdate(asset.id, resource, field.propertyId, e.target.value)}
 				/>
 			);
 		case "json":
@@ -107,6 +117,21 @@ export class ConfigTab extends React.Component {
 					label={field.propertyId}
 					variant={"outlined"}
 					value={field.value}
+					onChange={(e) => onConfigUpdate(asset.id, resource, field.propertyId, e.target.value)}
+				/>
+			);
+		case "boolean":
+			return (
+				<FormControlLabel
+					control={
+						<Checkbox
+							color={"primary"}
+							className={classes.checkbox}
+							checked={field.value}
+							onChange={(e) => onConfigUpdate(asset.id, resource, field.propertyId, e.target.checked)}
+						/>
+					}
+					label={field.propertyId}
 				/>
 			);
 		default:
@@ -116,7 +141,7 @@ export class ConfigTab extends React.Component {
 
 
 	render() {
-		const { classes, asset } = this.props;
+		const { classes, asset, onRuleUpdate } = this.props;
 
 		return (
 			<Grid className={classes.baseGrid} container>
@@ -131,7 +156,14 @@ export class ConfigTab extends React.Component {
 								return (
 									<FormControlLabel
 										key={`${asset.id}-${r.ruleName}`}
-										control={<Checkbox className={classes.checkbox} checked={r.selected} />}
+										control={
+											<Checkbox
+												color={"primary"}
+												className={classes.checkbox}
+												checked={r.selected}
+												onChange={(e) => onRuleUpdate(asset.id, r.ruleName, e.target.checked)}
+											/>
+										}
 										label={r.ruleName}
 									/>
 								);
@@ -150,17 +182,27 @@ export class ConfigTab extends React.Component {
 							return (
 								<Grid className={classes.resourceGrid} container item xs={12} key={k}>
 									<Paper className={classes.resourcePaper}>
-										<Grid className={classes.resourceHeaderGrid} item xs={12}>
-											<Typography>{k}</Typography>
+										<Grid className={classes.resourceHeaderGrid} container item xs={12}>
+											<Grid item xs={10}>
+												<Typography>{k}</Typography>
+											</Grid>
+											<Grid container item xs={2} justify={"flex-end"}>
+												<IconButton
+													size={"small"}
+													disabled={asset.configurationOptions.options[k].required}
+												>
+													<CloseIcon />
+												</IconButton>
+											</Grid>
 										</Grid>
 										<Grid container item xs={12}>
 											{ _.chunk(asset.configurationOptions.options[k].properties, 2).map((propPair) => {
 												return (
-													<Grid key={`pair-${propPair[0].propertyId}`} container item xs={12}>
+													<Grid key={`pair-${propPair[0].propertyId}`} className={classes.resourceOptionsRow} container item xs={12}>
 														{ propPair.map((p) => {
 															return (
 																<Grid key={p.propertyId} container item xs={6}>
-																	{this.renderField(p)}
+																	{this.renderField(k, p)}
 																</Grid>
 															);
 														})}
@@ -182,7 +224,9 @@ export class ConfigTab extends React.Component {
 
 ConfigTab.propTypes = {
 	classes: PropTypes.object.isRequired,
-	asset: PropTypes.object.isRequired
+	asset: PropTypes.object.isRequired,
+	onConfigUpdate: PropTypes.func.isRequired,
+	onRuleUpdate: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(ConfigTab);
