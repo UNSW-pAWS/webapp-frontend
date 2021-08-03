@@ -19,7 +19,7 @@ import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 
-const styles = (theme) => ({
+const styles = () => ({
 	baseGrid: {
 		border: "1px solid #BBBBBB",
 		boxSizing: "border-box",
@@ -144,11 +144,25 @@ export class ConfigTab extends React.Component {
 		}
 	}
 
+	formatPayload = (payload) => {
+		const payloadClone = _.cloneDeep(payload);
+		Object.keys(payloadClone.options).forEach((r) => {
+			delete payloadClone.options[r].multiple;
+			delete payloadClone.options[r].required;
+			payloadClone.options[r].properties.forEach((p) => {
+				Object.keys(p).forEach((k) =>
+					(k === "propertyId" || k === "value") || delete p[k]
+				)
+			})
+		})
+		return payloadClone;
+	}
+
 	handleSubmit = () => {
 		const { asset } = this.props;
 
 		const url = "http://localhost:5000/";
-		const payload = asset.configurationOptions;
+		const payload = this.formatPayload(asset.configurationOptions);
 
 		axios
 			.post(url, payload)
