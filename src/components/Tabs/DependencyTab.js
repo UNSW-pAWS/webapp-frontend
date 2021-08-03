@@ -34,6 +34,10 @@ const styles = () => ({
 	buttonRight: {
 		textAlign: "right"
 	},
+	subtitle: {
+		color: "#AAAAAA",
+		marginBottom: "0.25em"
+	},
 	inputGrid: {
 		position: "relative",
 		marginBottom: "0.5em"
@@ -244,6 +248,7 @@ export class DependencyTab extends React.Component {
 		return (
 			<Grid container direction={"column"}>
 				<Grid item className={classes.inputGrid}>
+					<Typography className={classes.subtitle}>This dependency checker verifies Javascript NPM packages</Typography>
 					<TextField
 						fullWidth
 						variant="outlined"

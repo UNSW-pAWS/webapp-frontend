@@ -161,7 +161,7 @@ export class ConfigTab extends React.Component {
 	handleSubmit = () => {
 		const { asset } = this.props;
 
-		const url = "http://localhost:5000/";
+		const url = `http://localhost:5000/cfn?resource=${asset.type}`;
 		const payload = this.formatPayload(asset.configurationOptions);
 
 		axios
