@@ -5,12 +5,12 @@ import clsx from "clsx";
 import { withStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
+import Tooltip from "@material-ui/core/Tooltip";
+import IconButton from "@material-ui/core/IconButton";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import { Rnd } from "react-rnd";
 
 import { TopArrowHandler, RightArrowHandler, BottomArrowHandler, LeftArrowHandler } from "../ArrowHandlers";
-import { Tooltip, IconButton } from "@material-ui/core";
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-
 import { ec2 } from "../../icons/resources/ec2";
 import { lambda } from "../../icons/resources/lambda";
 import { rds } from "../../icons/resources/rds";
@@ -148,7 +148,7 @@ export class CanvasAsset extends React.Component {
 	};
 
 	render() {
-		const { classes, id, metadata, isArrowBeingDrawn, selectedItem, toggleArrowDrawn, setDrawerButton } = this.props;
+		const { classes, id, metadata, isArrowBeingDrawn, selectedItem, toggleArrowDrawn, setDrawerState } = this.props;
 		const { hovered, arrowHovered, offset, size } = this.state;
 
 		const ResourceIcon = ICONS[metadata.type];
@@ -240,7 +240,7 @@ export class CanvasAsset extends React.Component {
 							<Tooltip title="Open menu">
 								<IconButton 
 									size="small" 
-									onClick={() => setDrawerButton(this.props.id)}
+									onClick={() => setDrawerState(id, true)}
 								>
 									<ArrowDropDownIcon fontSize="inherit"/>
 								</IconButton>
@@ -266,7 +266,8 @@ CanvasAsset.propTypes = {
 	isArrowBeingDrawn: PropTypes.bool.isRequired,
 	deleteAsset: PropTypes.func.isRequired,
 	addArrow: PropTypes.func.isRequired,
-	toggleAssetBeingDragged: PropTypes.func.isRequired
+	toggleAssetBeingDragged: PropTypes.func.isRequired,
+	setDrawerState: PropTypes.func.isRequired
 };
 
 CanvasAsset.defaultProps = {

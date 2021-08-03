@@ -5,6 +5,7 @@ import { withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
 
 const styles = (theme) => ({
 	appBar: {
@@ -35,9 +36,14 @@ export function Header({ classes }) {
 	return (
 		<AppBar className={classes.appBar} position="static" elevation={0}>
 			<Toolbar>
-				<Typography className={classes.name} variant={"h4"}>pAWS</Typography>
-				<Typography className={classes.bar} variant={"h5"}>  |  </Typography>
-				<Typography className={classes.appName} variant={"h6"}>Design and Configuration Tool</Typography>
+				<Grid container>
+					<Grid container item xs={10} alignItems={"center"}>
+						<Typography className={classes.name} variant={"h4"}>pAWS</Typography>
+						<Typography className={classes.bar} variant={"h5"}>  |  </Typography>
+						<Typography className={classes.appName} variant={"h6"}>Design and Configuration Tool</Typography>
+					</Grid>
+
+				</Grid>
 			</Toolbar>
 		</AppBar>
 	);

@@ -1,22 +1,41 @@
 import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
-import _, { get } from "lodash";
+import _ from "lodash";
 
 import { withStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { Drawer, AppBar, Tabs, Tab, Grid, Button } from "@material-ui/core";
+import Drawer from "@material-ui/core/Drawer";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Grid from "@material-ui/core/Grid";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
+import InputBase from "@material-ui/core/TextField";
 
 import { Arrow } from "../Arrow";
 import { CanvasAsset } from "../CanvasAsset";
 import { VPCAsset } from "../VPCAsset";
-import { DependecyTab, ConfigTab } from "../Tabs";
+import { DependencyTab, ConfigTab } from "../Tabs";
 
-const drawerWidth = 800;
-var prevAssetID = "asset-0";
-var currAssetID = "asset-0";
+import { LAMBDA_OPTIONS } from "../../resources/LambdaConfigOptions";
+import { RDS_OPTIONS } from "../../resources/RDSConfigOptions";
+import { S3_OPTIONS } from "../../resources/S3ConfigOptions";
+import { VPC_OPTIONS } from "../../resources/VPCConfigOptions";
+import { EC2_OPTIONS } from "../../resources/EC2ConfigOptions";
 
-const styles = (theme) => ({
+const drawerWidth = 600;
+
+const CONFIG_OPTIONS_MAP = {
+	"EC2": EC2_OPTIONS,
+	"Lambda": LAMBDA_OPTIONS,
+	"RDS": RDS_OPTIONS,
+	"S3": S3_OPTIONS,
+	"VPC": VPC_OPTIONS
+};
+
+const styles = () => ({
 	base: {
 		maxWidth: "100%",
 		height: "100%",
@@ -35,6 +54,10 @@ const styles = (theme) => ({
 	},
 	headingStyle: {
 		textAlign: "left",
+		marginBottom: "0.25em",
+	},
+	tabBar: {
+		marginBottom: "1em"
 	},
 	tab: {
 		minWidth: "33%",
@@ -45,13 +68,13 @@ const styles = (theme) => ({
 		backgroundColor: "rgb(255, 153, 0, 0.3)",
 		borderRight: "4px solid #FF9900"
 	},
-	tabs: {
-		width: "100%",
-		"& .MuiTabs-flexContainerHorizontal": {
-			width: "10%"
-		}
+	nameField: {
+		marginBottom: "0.5em"
+	},
+	nameInput: {
+		padding: "10px",
+		fontSize: "24px"
 	}
-
 });
 
 export class Canvas extends React.Component {
@@ -69,6 +92,7 @@ export class Canvas extends React.Component {
 			menuOpen: false,
 			tabValue: 0,
 			selectedItem: null,
+			currentDrawerAssetId: null,
 			assetNextId: 0,
 			arrowNextId: 0,
 			dependencyTab: [{
@@ -92,7 +116,6 @@ export class Canvas extends React.Component {
 	onDragLeave = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
-		this.setDrawer(false);
 	};
 
 	onDrop = (e) => {
@@ -107,23 +130,20 @@ export class Canvas extends React.Component {
 	};
 
 	addAsset = (x, y, name) => {
-		const { assets, assetNextId, dependencyTab } = this.state;
+		const { assets, assetNextId } = this.state;
 		
 		const newAsset = {
 			id: `asset-${assetNextId}`,
 			x: x,
 			y: y,
 			type: name.toLowerCase(),
-			name: name
-		};
-		
-		// dynamically extend array
-		if(assetNextId >= dependencyTab.length) {
-			dependencyTab.push({
+			name: name,
+			configurationOptions: CONFIG_OPTIONS_MAP[name],
+			dependencyOptions: {
 				input: "",
-				result: "",
+				result: null,
 				depth: 1
-			});
+			}
 		};
 
 		this.setState({
@@ -177,112 +197,153 @@ export class Canvas extends React.Component {
 		this.setState({ selectedItem: id });
 	}
 
-	setDrawer = (isOpen) => {
-		this.setState({ menuOpen: isOpen });
-		this.setState({ selectedItem: null });
+	setDrawerState = (assetId, state) => {
+		this.setState({
+			tabValue: 0,
+			currentDrawerAssetId: assetId,
+			menuOpen: state
+		}, () => {
+			this.setSelectedItem(null);
+		});
 	};
 
-	setDrawerButton = (id) => {
-		const { menuOpen } = this.state;
-
-		var currID = this.getIntID(id);
-		var prevID = this.getIntID(prevAssetID);
-
-		if(currID != prevID && menuOpen == true) {
-			//quick refresh of drawer to current asset
-			this.setDrawer(false);
-			this.setDrawer(true);
-		}
-		else {
-			this.setDrawer(!menuOpen);
-		};
-
-		currAssetID = id;
-		prevAssetID = currAssetID;
-
-		this.setState({ selectedItem: null });
+	changeTab = (_, index) => {
+		this.setState({	tabValue: index });
 	};
 
-	getIntID = (id) => {
-		var intID = id.match(/\d/g);
-		intID = parseInt(intID.join(""));
-		return intID;
+	onAssetNameUpdate = (assetId, value) => {
+		const { assets } = this.state;
+
+		const assetsClone = _.cloneDeep(assets);
+		const updatedAssetIndex = assetsClone.findIndex((a) => a.id === assetId);
+
+		assetsClone[updatedAssetIndex].name = value;
+
+		this.setState({ assets: assetsClone });
 	};
 
-	changeTab = (event, index) => {
-		this.setState({ tabValue: index });
-	};
+	onDependencyUpdate = (assetId, field, value) => {
+		const { assets } = this.state;
 
-	updateDependencyTab = (id, input, result, depth) => {
-		const { dependencyTab } = this.state;
-		var newArr = [...dependencyTab];
-		newArr[id].input = input;
-		newArr[id].result = result;
-		newArr[id].depth = depth;
-		
-		if(JSON.stringify(newArr[id]) != JSON.stringify(dependencyTab[id])) {
-			this.setState({ dependencyTab: newArr });
+		if (field !== "input" && field !== "result" && field !== "depth" && field !== "all") {
 			return;
-		};
+		}
+
+		const assetsClone = _.cloneDeep(assets);
+		const updatedAssetIndex = assetsClone.findIndex((a) => a.id === assetId);
+		
+		if (field === "all") {
+			assetsClone[updatedAssetIndex].dependencyOptions = value;
+		} else {
+			assetsClone[updatedAssetIndex].dependencyOptions[field] = value;
+		}
+
+		this.setState({ assets: assetsClone });
 	};
+
+	onConfigurationUpdate = (assetId, resource, property, value) => {
+		const { assets } = this.state;
+
+		const assetsClone = _.cloneDeep(assets);
+		const updatedAssetIndex = assetsClone.findIndex((a) => a.id === assetId);
+
+		assetsClone[updatedAssetIndex].configurationOptions.options[resource].properties.forEach(p => {
+			if (p.propertyId === property) {
+				p.value = value;
+			}
+		});
+
+		this.setState({ assets: assetsClone });
+	};
+
+	onRuleUpdate = (assetId, ruleName, value) => {
+		const { assets } = this.state;
+
+		const assetsClone = _.cloneDeep(assets);
+		const updatedAssetIndex = assetsClone.findIndex((a) => a.id === assetId);
+
+		assetsClone[updatedAssetIndex].configurationOptions.rules.forEach((r) => {
+			if (r.ruleName === ruleName) {
+				r.selected = value;
+			}
+		});
+
+		this.setState({ assets: assetsClone });
+	}
 
 	renderTab = (value) => {
-		const { dependencyTab } = this.state;
-		var currID = this.getIntID(currAssetID);
+		const { currentDrawerAssetId, assets } = this.state;
+
+		const currentAsset = assets.find((a) => a.id === currentDrawerAssetId);
 
 		switch(value) {
 		case 0:
 			return (
-				<DependecyTab
-					id={currID}
-					updateTab={this.updateDependencyTab}
-					data={dependencyTab[currID]}
+				<ConfigTab
+					asset={currentAsset}
+					onConfigUpdate={this.onConfigurationUpdate}
+					onRuleUpdate={this.onRuleUpdate}
 				/>
 			);
+
 		case 1:
 			return (
-				<ConfigTab/>
+				<DependencyTab
+					asset={currentAsset}
+					onUpdate={this.onDependencyUpdate}
+				/>
 			);
-		};
-	};
+		default:
+			return;
+		}
+	}
 
 	DrawerContents = () => {
 		const { classes } = this.props;
-		const { tabValue } = this.state;
+		const { tabValue, assets, currentDrawerAssetId } = this.state;
+
+		const currentAsset = assets.find((a) => a.id === currentDrawerAssetId);
+
 		return (
-			<div className={classes.drawerStyle}>
-				<Grid container spacing={3}>
-					<Grid item xs={2}>
-						<h2 className={classes.headingStyle}>
-							{currAssetID}
-						</h2>
+			<Grid className={classes.drawerStyle} container direction={"column"}>
+				<Grid container item>
+					<Grid item xs={11}>
+						<InputBase
+							className={classes.nameField}
+							variant={"outlined"}
+							value={currentAsset.name}
+							inputProps={{
+								className: classes.nameInput
+							}}
+							onChange={(e) => this.onAssetNameUpdate(currentDrawerAssetId, e.target.value)}
+						/>
 					</Grid>
-					<Grid item xs={2}>
-						<Button
-							onClick={() => this.setDrawer(false)}
-							size="small"
-							variant="outlined"
+					<Grid item xs={1}>
+						<IconButton
+							size={"small"}
+							onClick={() => this.setDrawerState(null, false)}
 						>
-							Close menu
-						</Button>
+							<CloseIcon />
+						</IconButton>
 					</Grid>
 				</Grid>
-
-				<AppBar position="static">
-					<Tabs 
-						variant={"fullWidth"}
-						value={tabValue} 
-						onChange={this.changeTab} 
-						aria-label="simple tabs example"
-					>
-						<Tab label="item 1" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>
-						<Tab label="item 2" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
-					</Tabs>
-				</AppBar>
-				<div>
+				<Grid container item>
+					<AppBar position="static" className={classes.tabBar}>
+						<Tabs 
+							variant={"fullWidth"}
+							value={tabValue} 
+							onChange={this.changeTab} 
+							aria-label="simple tabs example"
+						>
+							<Tab label="Configuration" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>
+							<Tab label="Dependency Checker" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
+						</Tabs>
+					</AppBar>
+				</Grid>
+				<Grid container item>
 					{ this.renderTab(tabValue) }
-				</div>
-			</div>
+				</Grid>
+			</Grid>
 		);
 	};
 
@@ -298,18 +359,18 @@ export class Canvas extends React.Component {
 				onDragEnter={this.onDragEnter}
 				onDragOver={this.onDragOver}
 				onDragLeave={this.onDragLeave}
-				onDragEnd={this.onDragEnd}
 				onDrop={this.onDrop}
 			>
-				<Drawer 
-					anchor="right"
-					variant="persistent"
-					open={menuOpen}
-					onClose={() => this.setDrawer(false)}
-					className={classes.drawerStyle}
-				>
-					{this.DrawerContents()}
-				</Drawer>
+				{ menuOpen && (
+					<Drawer 
+						anchor="right"
+						open={menuOpen}
+						onClose={() => this.setDrawerState(null, false)}
+						className={classes.drawerStyle}
+					>
+						{this.DrawerContents()}
+					</Drawer>
+				)}
 
 				{ assets.map((a) => {
 					return (
@@ -322,6 +383,7 @@ export class Canvas extends React.Component {
 									selectedItem={selectedItem}
 									setSelectedItem={this.setSelectedItem}
 									deleteAsset={this.deleteAsset}
+									setDrawerState={this.setDrawerState}
 									toggleAssetBeingDragged={() => {
 										this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
 									}}
@@ -339,7 +401,7 @@ export class Canvas extends React.Component {
 									}}
 									deleteAsset={this.deleteAsset}
 									addArrow={this.addArrow}
-									setDrawerButton={this.setDrawerButton}
+									setDrawerState={this.setDrawerState}
 									toggleAssetBeingDragged={() => {
 										this.setState({ isAssetBeingDragged: !isAssetBeingDragged });
 									}}
