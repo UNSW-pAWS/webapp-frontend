@@ -18,6 +18,12 @@ import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import GetAppIcon from "@material-ui/icons/GetApp";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const styles = () => ({
 	baseGrid: {
@@ -64,6 +70,14 @@ const styles = () => ({
 	},
 	submitButtonGrid: {
 		margin: "1em 0.5em 0.5em 0.5em"
+	},
+	button: {
+		margin: "0.5em"
+	},
+	checkProgress: {
+		marginRight: "36px",
+		marginTop: "16px",
+		position: "absolute"
 	}
 });
 
@@ -71,6 +85,15 @@ export class ConfigTab extends React.Component {
 
 	constructor(props) {
 		super(props);
+
+		this.state = {
+			isSubmitting: false,
+			readyForDownload: false,
+			cfn: {},
+			cfc: "",
+			cfnLink: null,
+			cfcLink: null
+		};
 	}
 
 	renderField = (resource, field) => {
@@ -152,108 +175,200 @@ export class ConfigTab extends React.Component {
 			payloadClone.options[r].properties.forEach((p) => {
 				Object.keys(p).forEach((k) =>
 					(k === "propertyId" || k === "value") || delete p[k]
-				)
-			})
-		})
+				);
+			});
+		});
 		return payloadClone;
 	}
 
 	handleSubmit = () => {
 		const { asset } = this.props;
 
-		const url = `http://localhost:5000/cfn?resource=${asset.type}`;
+		this.setState({ isSubmitting: true });
+
 		const payload = this.formatPayload(asset.configurationOptions);
 
+		const cfnPost = axios.post(`http://paws-backend.link/config/generate/cfn?resource=${asset.type}`, payload);
+		const cfcPost = axios.post("http://paws-backend.link/config/generate/cfc", payload);
+
 		axios
-			.post(url, payload)
-			.then((response) => {
-				console.log(response.data);
-			})
+			.all([cfnPost, cfcPost])
+			.then(axios.spread((...responses) => {
+				const cfnResponse = responses[0].data;
+				const cfcResponse = responses[1].data;
+
+				const cfnBlob = new Blob([JSON.stringify(cfnResponse, null, 2)]);
+				const cfcBlob = new Blob([cfcResponse]);
+				const cfnDownloadLink= URL.createObjectURL(cfnBlob);
+				const cfcDownloadLink = URL.createObjectURL(cfcBlob);
+
+				this.setState({
+					readyForDownload: true,
+					cfn: cfnResponse,
+					cfc: cfcResponse,
+					cfnLink: cfnDownloadLink,
+					cfcLink: cfcDownloadLink
+				});
+			}))
 			.catch((error) => {
-				console.log(error.data);
+				console.log(error);
+			})
+			.finally(() => {
+				this.setState({ isSubmitting: false });
 			});
 	}
 
 	render() {
 		const { classes, asset, onRuleUpdate } = this.props;
+		const { readyForDownload, cfnLink, cfcLink, isSubmitting } = this.state;
 
 		return (
-			<Grid className={classes.baseGrid} container>
-				<Grid container item xs={12} direction={"column"}>
-					<Grid container item justify={"flex-start"}>
-						<Typography className={classes.title}>AWS Managed Rules</Typography>
-						<Typography className={classes.subtitle}>Please select which rules you would like to include</Typography>
+			<React.Fragment>
+				<Grid className={classes.baseGrid} container>
+					<Grid container item xs={12} direction={"column"}>
+						<Grid container item justify={"flex-start"}>
+							<Typography className={classes.title}>AWS Managed Rules</Typography>
+							<Typography className={classes.subtitle}>Please select which rules you would like to include</Typography>
+						</Grid>
+						<Grid className={classes.managedRulesGrid} item>
+							<FormGroup className={classes.managedRulesForm}>
+								{ asset.configurationOptions.rules.map((r) => {
+									return (
+										<FormControlLabel
+											key={`${asset.id}-${r.ruleName}`}
+											control={
+												<Checkbox
+													color={"primary"}
+													className={classes.checkbox}
+													checked={r.selected}
+													onChange={(e) => onRuleUpdate(asset.id, r.ruleName, e.target.checked)}
+												/>
+											}
+											label={r.ruleName}
+										/>
+									);
+								})}
+							</FormGroup>
+							<Divider />
+						</Grid>
 					</Grid>
-					<Grid className={classes.managedRulesGrid} item>
-						<FormGroup className={classes.managedRulesForm}>
-							{ asset.configurationOptions.rules.map((r) => {
+					<Grid className={classes.configurationGrid} container item xs={12}>
+						<Grid container item xs={12} justify={"flex-start"}>
+							<Typography className={classes.title}>Configuration</Typography>
+							<Typography className={classes.subtitle}>Please select the configuration for each resource</Typography>
+						</Grid>
+						<Grid container item xs={12}>
+							{ Object.keys(asset.configurationOptions.options).map((k) => {
 								return (
-									<FormControlLabel
-										key={`${asset.id}-${r.ruleName}`}
-										control={
-											<Checkbox
-												color={"primary"}
-												className={classes.checkbox}
-												checked={r.selected}
-												onChange={(e) => onRuleUpdate(asset.id, r.ruleName, e.target.checked)}
-											/>
-										}
-										label={r.ruleName}
-									/>
+									<Grid className={classes.resourceGrid} container item xs={12} key={k}>
+										<Paper className={classes.resourcePaper}>
+											<Grid className={classes.resourceHeaderGrid} container item xs={12}>
+												<Grid item xs={12}>
+													<Typography>{k}</Typography>
+												</Grid>
+											</Grid>
+											<Grid container item xs={12}>
+												{ _.chunk(asset.configurationOptions.options[k].properties, 2).map((propPair) => {
+													return (
+														<Grid key={`pair-${propPair[0].propertyId}`} className={classes.resourceOptionsRow} container item xs={12}>
+															{ propPair.map((p) => {
+																return (
+																	<Grid key={p.propertyId} container item xs={6}>
+																		{this.renderField(k, p)}
+																	</Grid>
+																);
+															})}
+														</Grid>
+													);
+												})}
+											</Grid>
+										</Paper>
+									</Grid>
 								);
 							})}
-						</FormGroup>
-						<Divider />
-					</Grid>
-				</Grid>
-				<Grid className={classes.configurationGrid} container item xs={12}>
-					<Grid container item xs={12} justify={"flex-start"}>
-						<Typography className={classes.title}>Configuration</Typography>
-						<Typography className={classes.subtitle}>Please select the configuration for each resource</Typography>
-					</Grid>
-					<Grid container item xs={12}>
-						{ Object.keys(asset.configurationOptions.options).map((k) => {
-							return (
-								<Grid className={classes.resourceGrid} container item xs={12} key={k}>
-									<Paper className={classes.resourcePaper}>
-										<Grid className={classes.resourceHeaderGrid} container item xs={12}>
-											<Grid item xs={12}>
-												<Typography>{k}</Typography>
-											</Grid>
-										</Grid>
-										<Grid container item xs={12}>
-											{ _.chunk(asset.configurationOptions.options[k].properties, 2).map((propPair) => {
-												return (
-													<Grid key={`pair-${propPair[0].propertyId}`} className={classes.resourceOptionsRow} container item xs={12}>
-														{ propPair.map((p) => {
-															return (
-																<Grid key={p.propertyId} container item xs={6}>
-																	{this.renderField(k, p)}
-																</Grid>
-															);
-														})}
-													</Grid>
-												);
-											})}
-										</Grid>
-									</Paper>
-								</Grid>
-							);
-						})}
-					</Grid>
-					<Grid container item xs={12} justify={"flex-end"}>
-						<Button
-							className={classes.submitButtonGrid}
-							variant={"contained"}
-							color={"primary"}
-							onClick={this.handleSubmit}
-						>
-							Submit
-						</Button>
+						</Grid>
+						<Grid container item xs={12} justify={"flex-end"}>
+							{ isSubmitting && (
+								<CircularProgress className={classes.checkProgress} size={30}/>
+							)}
+							<Button
+								className={classes.submitButtonGrid}
+								variant={"contained"}
+								color={"primary"}
+								onClick={this.handleSubmit}
+								disabled={isSubmitting}
+							>
+								Submit
+							</Button>
 
+						</Grid>
 					</Grid>
 				</Grid>
-			</Grid>
+				<Dialog
+					open={readyForDownload}
+					onClose={() => {
+						this.setState({
+							readyForDownload: false,
+							cfn: {},
+							cfc: "",
+							cfnLink: null,
+							cfcLink: null
+						});
+					}}
+				>
+					<DialogTitle>{`${asset.name}: Configuration files`}</DialogTitle>
+					<DialogContent>
+						<Grid container>
+							<Grid container item>
+								<a
+									style={{ textDecoration: "none" }}
+									href={cfnLink}
+									download={`CFNTemplate-${asset.name}.json`}
+								>
+									<Button
+										className={classes.button}
+										variant={"contained"}
+										color={"primary"}
+										startIcon={<GetAppIcon />}
+									>
+										CloudFormation Template
+									</Button>
+								</a>
+								<a
+									style={{ textDecoration: "none" }}
+									href={cfcLink}
+									download={`ConformancePack-${asset.name}.yaml`}
+								>
+									<Button
+										className={classes.button}
+										variant={"contained"}
+										color={"primary"}
+										startIcon={<GetAppIcon />}
+									>
+										Conformance Pack
+									</Button>
+								</a>
+							</Grid>
+						</Grid>
+					</DialogContent>
+					<DialogActions>
+						<Button
+							className={classes.button}
+							onClick={() => {
+								this.setState({
+									readyForDownload: false,
+									cfn: {},
+									cfc: "",
+									cfnLink: null,
+									cfcLink: null
+								});
+							}}
+						>
+							Close
+						</Button>
+					</DialogActions>
+				</Dialog>
+			</React.Fragment>
 		);
 	}
 
