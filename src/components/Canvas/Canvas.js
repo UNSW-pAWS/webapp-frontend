@@ -336,7 +336,9 @@ export class Canvas extends React.Component {
 							aria-label="simple tabs example"
 						>
 							<Tab label="Configuration" className={clsx(classes.tab, tabValue === 0 && classes.activeTab)} value={0}/>
-							<Tab label="Dependency Checker" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
+							{ ["lambda", "ec2"].includes(currentAsset.type) && (
+								<Tab label="Dependency Checker" className={clsx(classes.tab, tabValue === 1 && classes.activeTab)} value={1}/>
+							)}
 						</Tabs>
 					</AppBar>
 				</Grid>

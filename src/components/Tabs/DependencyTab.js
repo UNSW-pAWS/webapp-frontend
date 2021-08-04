@@ -34,6 +34,10 @@ const styles = () => ({
 	buttonRight: {
 		textAlign: "right"
 	},
+	subtitle: {
+		color: "#AAAAAA",
+		marginBottom: "0.25em"
+	},
 	inputGrid: {
 		position: "relative",
 		marginBottom: "0.5em"
@@ -126,7 +130,7 @@ export class DependencyTab extends React.Component {
 					"/threat/search",
 					request, 
 					{ 
-						baseURL: "http://dependency.eba-5uazmhpj.ap-southeast-2.elasticbeanstalk.com"
+						baseURL: "http://paws-backend.link"
 					}
 				).then(response => {
 					this.setState({ disableSearch: false }, () => {
@@ -244,6 +248,7 @@ export class DependencyTab extends React.Component {
 		return (
 			<Grid container direction={"column"}>
 				<Grid item className={classes.inputGrid}>
+					<Typography className={classes.subtitle}>This dependency checker verifies Javascript NPM packages</Typography>
 					<TextField
 						fullWidth
 						variant="outlined"

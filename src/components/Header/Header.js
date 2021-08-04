@@ -6,6 +6,7 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
+import Logo from "../../resources/logo.png";
 
 const styles = (theme) => ({
 	appBar: {
@@ -27,6 +28,10 @@ const styles = (theme) => ({
 	appName: {
 		whiteSpace: "pre",
 		fontFamily: "'Lucida Console', 'Courier New', monospace"
+	},
+	logo: {
+		height: "3rem",
+		objectFit: "contain"
 	}
 });
 
@@ -37,8 +42,8 @@ export function Header({ classes }) {
 		<AppBar className={classes.appBar} position="static" elevation={0}>
 			<Toolbar>
 				<Grid container>
-					<Grid container item xs={10} alignItems={"center"}>
-						<Typography className={classes.name} variant={"h4"}>pAWS</Typography>
+					<Grid container item xs={11} alignItems={"center"}>
+						<img className={classes.logo} src={Logo} />
 						<Typography className={classes.bar} variant={"h5"}>  |  </Typography>
 						<Typography className={classes.appName} variant={"h6"}>Design and Configuration Tool</Typography>
 					</Grid>
