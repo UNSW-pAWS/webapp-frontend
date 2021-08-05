@@ -1,5 +1,15 @@
 # pAWS | Application Configuration Tool
 
+<br/>
+
+<p align="center">
+  <img width="200" src="./static/logo.png">
+</p>
+
+
+<br/>
+<br/>
+
 ReactJS application which allows users to quickly create their application's architecture diagram and specify their configuration. This tool put security at the forefront and also allows users to select what AWS Managed Rules they want to be guided by.
 
 <br />
@@ -33,3 +43,20 @@ Eslint is a linter that can help to tidy up your cody and ensures everyone worki
 
 #### Fixing all auto-fixable errors:
     npx eslint ./src --fix
+
+
+### Deployment
+The tool has been deployed onto AWS using AWS Amplify. To deploy, follow the steps below:
+
+1. Run the below command in the repository's directory.
+    ```    
+    cd ./
+    set DISABLE_ESLINT_PLUGIN=true
+    npm run build
+    ```
+2. Go to the AWS Console and navigate to the AWS Amplify dashboard
+3. Click <b>New app</b> and <b>Host web app</b>
+4. Select <b>Deploy without a Git provider</b>
+5. Drag and drop your ```./build``` directory into the Console
+6. Select <b>Save and Deploy</b>
+7. Your app should be ready to access now!
