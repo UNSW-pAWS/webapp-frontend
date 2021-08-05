@@ -130,7 +130,7 @@ export class DependencyTab extends React.Component {
 					"/threat/search",
 					request, 
 					{ 
-						baseURL: "http://paws-backend.link"
+						baseURL: "https://paws-backend.link"
 					}
 				).then(response => {
 					this.setState({ disableSearch: false }, () => {

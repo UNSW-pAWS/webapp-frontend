@@ -188,8 +188,8 @@ export class ConfigTab extends React.Component {
 
 		const payload = this.formatPayload(asset.configurationOptions);
 
-		const cfnPost = axios.post(`http://paws-backend.link/config/generate/cfn?resource=${asset.type}`, payload);
-		const cfcPost = axios.post("http://paws-backend.link/config/generate/cfc", payload);
+		const cfnPost = axios.post(`https://paws-backend.link/config/generate/cfn?resource=${asset.type}`, payload);
+		const cfcPost = axios.post("https://paws-backend.link/config/generate/cfc", payload);
 
 		axios
 			.all([cfnPost, cfcPost])
