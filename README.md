@@ -29,11 +29,12 @@ ReactJS application which allows users to quickly create their application's arc
 ## Developer Guide
 
 ### How to run:
-1. Change into the correct directory - ```cd ./```
-2. Ensure that there isn't an existing node_modules by running ```rm -rf node_modules```
-3. Install the required node modules - ```npm install```
-4. Start the app - ```npm start```
-5. The app should be runnning on ```localhost:3000```
+1. Change the endpoints in `DependencyTab.js` and `ConfigTab.js` to point to the correct backend API
+2. Change into the correct directory - ```cd ./```
+3. Ensure that there isn't an existing node_modules by running ```rm -rf node_modules```
+4. Install the required node modules - ```npm install```
+5. Start the app - ```npm start```
+6. The app should be runnning on ```localhost:3000```
 
 ### Running with Docker:
 1. Install Docker on your machine by following this [guide](https://docs.docker.com/desktop/)
