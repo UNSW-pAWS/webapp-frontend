@@ -140,7 +140,7 @@ Once the resource has been configured, the CloudFormation template and Conforman
 
 ### Using the Dependency Checker Tool
 
-The Dependency Checker Tool is available for Compute resources in the Configuration Panel. Users can enter the names of the packages to be checked as well as the depth of the dependency tree that they wish to check up to. Multiple packages can be searched by entering names in the format `PackageName1, PackageName2, PackageName3...`. Results will then be listed in the panel.
+The Dependency Checker Tool is available for Compute resources in the Configuration Panel. Users can enter the names of the packages to be checked as well as the depth of the dependency tree that they wish to check up to. Multiple packages can be searched by entering names in the format `PackageName1, PackageName2, PackageName3...` Results will then be listed in the panel.
 
 <p align="center">
   <img width="800" src="./static/demos/DependencyChecker.gif">
