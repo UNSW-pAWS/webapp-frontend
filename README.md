@@ -14,6 +14,18 @@ ReactJS application which allows users to quickly create their application's arc
 
 <br />
 
+## Table of Contents
+1. [Developer Guide](#developer-guide)
+    1. [How to run](#how-to-run)
+    2. [Running with Docker](#running-with-docker)
+    3. [Using eslint](#using-eslint)
+    4. [Deployment](#deployment)
+2. [User Guide](#user-guide)
+
+<br />
+
+---
+
 ## Developer Guide
 
 ### How to run:
@@ -60,3 +72,77 @@ The tool has been deployed onto AWS using AWS Amplify. To deploy, follow the ste
 5. Drag and drop your ```./build``` directory into the Console
 6. Select <b>Save and Deploy</b>
 7. Your app should be ready to access now!
+
+---
+
+## User Guide
+
+The application is based on a simple drag-and-drop functionality. The resources represent the AWS instances and services that make up the system. The connections represent the data flows or linkages between the instances.
+
+Basic functionality and usage is outlined below.
+
+### Adding and Removing Resources
+
+To add resources, drag a resource tile from the asset bar on the left onto the canvas.
+
+<p align="center">
+  <img width="800" src="./static/demos/AddResource.gif">
+</p>
+
+To remove resources, click on the resource you wish to remove - a green outline should appear. Then press the `BACKSPACE` or `DELETE` keys to remove the resource.
+
+<p align="center">
+  <img width="800" src="./static/demos/RemoveResource.gif">
+</p>
+
+
+### Adding and Removing Connections
+
+To add a connection, hover over the starting resource so that the connection handlers appear. Then, drag one of the handlers over to the ending resource and drop it. A connection should appear between the two resources.
+
+<p align="center">
+  <img width="800" src="./static/demos/AddConnection.gif">
+</p>
+
+To remove a connection, click on the connection you wish to remove - it's colour should change to green. Then press the `BACKSPACE` or `DELETE` keys to remove the connection.
+
+<p align="center">
+  <img width="800" src="./static/demos/RemoveConnection.gif">
+</p>
+
+### Moving and Resizing Resources
+
+Resources can be moved around the canvas by simply dragging and dropping them.
+
+<p align="center">
+  <img width="800" src="./static/demos/MovingResources.gif">
+</p>
+
+Resources can be resized from any one of the 4 corners by dragging the resize handlers as shown below.
+
+<p align="center">
+  <img width="800" src="./static/demos/ResizingResources.gif">
+</p>
+
+### Configuring Resources
+
+Each resource type has a specific list of configurable options that are available in the Configuration Panel. The Panel is accessible via the arrow located on each resource tile.
+
+<p align="center">
+  <img width="800" src="./static/demos/ConfiguringResource.gif">
+</p>
+
+Once the resource has been configured, the CloudFormation template and Conformance Pack can be retrieved and downloaded by pressing the `Submit` button at the bottom.
+
+<p align="center">
+  <img width="800" src="./static/demos/ExportingResource.gif">
+</p>
+
+### Using the Dependency Checker Tool
+
+The Dependency Checker Tool is available for Compute resources in the Configuration Panel. Users can enter the names of the packages to be checked as well as the depth of the dependency tree that they wish to check up to. Results will then be listed in the panel.
+
+<p align="center">
+  <img width="800" src="./static/demos/DependencyChecker.gif">
+</p>
+
